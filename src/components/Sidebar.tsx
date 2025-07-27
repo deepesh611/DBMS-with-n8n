@@ -1,4 +1,4 @@
-import { Users, BarChart3, UserPlus, Settings, Home } from "lucide-react"
+import { Users, BarChart3, UserPlus, Settings, Home, Upload } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
@@ -12,6 +12,7 @@ const sidebarItems = [
   { id: "members", label: "Members", icon: Users },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "add-member", label: "Add Member", icon: UserPlus },
+  { id: "bulk-import", label: "Bulk Import", icon: Upload },
   { id: "settings", label: "Settings", icon: Settings },
 ]
 

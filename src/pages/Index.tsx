@@ -5,6 +5,7 @@ import { ThemeToggle } from "@/components/ThemeToggle"
 import { Dashboard } from "@/components/Dashboard"
 import { MembersList } from "@/components/MembersList"
 import { MemberForm } from "@/components/MemberForm"
+import { BulkImport } from "@/components/BulkImport"
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard")
@@ -39,6 +40,8 @@ const Index = () => {
             onCancel={handleCancelEdit}
           />
         )
+      case "bulk-import":
+        return <BulkImport onImportComplete={() => setActiveTab("members")} />
       case "analytics":
         return (
           <div className="space-y-6">
