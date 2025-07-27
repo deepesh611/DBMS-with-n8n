@@ -80,7 +80,7 @@ You’ll need a few things installed — but you probably have them already:
 
 If you see this in the console:
 ```bash
-   Cross-Origin Request Blocked... blah blah...
+Cross-Origin Request Blocked... blah blah...
 ```
 Add this env variable to your n8n instance:
 ```bash
