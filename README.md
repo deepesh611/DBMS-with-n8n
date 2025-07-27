@@ -64,3 +64,6 @@ Follow these steps to set up and run the project locally:
 - The app uses the webhook URL from .env for API calls to n8n.
 - To change the n8n endpoint, update the value in .env and restart the server.
 - All database management actions are automated via n8n workflows.
+
+> **NOTE:-**
+> If you are getting CORS error, add an environment variable `N8N_CORS_ENABLED` with value `true` in your n8n instance. This will allow cross-origin requests from your Vite app.
