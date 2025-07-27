@@ -1,73 +1,64 @@
-# Welcome to your Lovable project
+# DBMS-with-n8n
 
-## Project info
+A modern React application for database management, integrated with [n8n](https://n8n.io/) for backend and workflow automation. This project demonstrates how to connect a React frontend to n8n using webhooks, with configuration via environment variables.
 
-**URL**: https://lovable.dev/projects/1c85e620-d225-4abe-9155-5d9f38f32c27
+> **This project can be completely self-hosted, giving you full control over your data and workflows.**
 
-## How can I edit this code?
+## Table of Contents
 
-There are several ways of editing your application.
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
 
-**Use Lovable**
+## Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/1c85e620-d225-4abe-9155-5d9f38f32c27) and start prompting.
+- React frontend built with TypeScript
+- Connects to n8n via configurable webhook endpoint
+- Secure environment variable management
+- Modular and scalable codebase
+- Easy setup and deployment
 
-Changes made via Lovable will be committed automatically to this repo.
+## Tech Stack
 
-**Use your preferred IDE**
+- **Frontend:** React, TypeScript, JavaScript
+- **Automation:** n8n (via webhook)
+- **Package Manager:** npm
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Prerequisites
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Node.js (v16 or higher recommended)
+- npm (comes with Node.js)
+- n8n instance (local or remote, both can be self-hosted for full control)
 
-Follow these steps:
+## Getting Started
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Follow these steps to set up and run the project locally:
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+1. **Clone the repository:**
+   ```sh
+   git clone https://github.com/deepesh611/DBMS-with-n8n.git
+   cd DBMS-with-n8n
+   ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+2. **Install dependencies:**
+   ```sh
+    npm install
+    ```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/1c85e620-d225-4abe-9155-5d9f38f32c27) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+3. **Set up environment variables:**
+   Copy the `.env.example` file to `.env` and update the values as needed:
+   ```sh
+   cp .env.example .env
+   ```
+    Update the `REACT_APP_N8N_WEBHOOK_URL` with your n8n webhook URL.
+4. **Start the development server:**
+   ```sh
+   npm run dev
+   ```
+   
+## Usage
+- The app uses the webhook URL from .env for API calls to n8n.
+- To change the n8n endpoint, update the value in .env and restart the server.
+- All database management actions are automated via n8n workflows.
