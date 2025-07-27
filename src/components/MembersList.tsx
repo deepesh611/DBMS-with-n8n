@@ -68,14 +68,14 @@ export function MembersList({ onEditMember }: MembersListProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Members</h1>
+          <h1 className="text-2xl md:text-3xl font-bold">Members</h1>
           <p className="text-muted-foreground mt-2">
             Manage your organization's members
           </p>
         </div>
-        <div className="relative w-64">
+        <div className="relative w-full md:w-64">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search members..."
@@ -92,41 +92,41 @@ export function MembersList({ onEditMember }: MembersListProps) {
             {filteredMembers.map((member) => (
               <div
                 key={member.id}
-                className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-secondary/30 transition-smooth"
+                className="flex flex-col md:flex-row md:items-center justify-between p-4 border border-border rounded-lg hover:bg-secondary/30 transition-smooth gap-4"
               >
                 <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold text-lg">
+                  <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold text-lg flex-shrink-0">
                     {member.name.split(' ').map(n => n[0]).join('')}
                   </div>
-                  <div className="space-y-1">
+                  <div className="space-y-1 min-w-0 flex-1">
                     <h3 className="font-semibold">{member.name}</h3>
                     <p className="text-sm text-muted-foreground">
                       {member.position} • {member.department}
                     </p>
-                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                    <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-1 md:space-y-0 text-sm text-muted-foreground">
                       <div className="flex items-center space-x-1">
-                        <Mail className="h-3 w-3" />
-                        <span>{member.email}</span>
+                        <Mail className="h-3 w-3 flex-shrink-0" />
+                        <span className="truncate">{member.email}</span>
                       </div>
                       <div className="flex items-center space-x-1">
-                        <Phone className="h-3 w-3" />
+                        <Phone className="h-3 w-3 flex-shrink-0" />
                         <span>{member.phone}</span>
                       </div>
                     </div>
                   </div>
                 </div>
                 
-                <div className="flex items-center space-x-4">
-                  <div className="text-right space-y-1">
+                <div className="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-4">
+                  <div className="flex items-center justify-between md:block md:text-right space-y-1">
                     <Badge className={getStatusBadge(member.status)}>
                       {member.status}
                     </Badge>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground md:mt-1">
                       Joined {new Date(member.joinDate).toLocaleDateString()}
                     </p>
                   </div>
                   
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-2 justify-end">
                     <Button
                       variant="ghost"
                       size="icon"

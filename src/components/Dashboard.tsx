@@ -13,7 +13,7 @@ export function Dashboard() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <h1 className="text-2xl md:text-3xl font-bold">Dashboard</h1>
         <p className="text-muted-foreground mt-2">
           Overview of your organization's membership
         </p>
@@ -57,17 +57,17 @@ export function Dashboard() {
           <h3 className="text-lg font-semibold mb-4">Recent Members</h3>
           <div className="space-y-4">
             {recentMembers.map((member) => (
-              <div key={member.id} className="flex items-center justify-between p-4 bg-secondary/50 rounded-lg">
+              <div key={member.id} className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-secondary/50 rounded-lg gap-3">
                 <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold">
+                  <div className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold flex-shrink-0">
                     {member.name.split(' ').map(n => n[0]).join('')}
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="font-medium">{member.name}</p>
                     <p className="text-sm text-muted-foreground">{member.position} • {member.department}</p>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="flex items-center justify-between md:block md:text-right">
                   <p className="text-sm text-muted-foreground">
                     Joined {new Date(member.joinDate).toLocaleDateString()}
                   </p>

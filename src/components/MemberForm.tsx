@@ -76,7 +76,7 @@ export function MemberForm({ member, onSave, onCancel }: MemberFormProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-2xl md:text-3xl font-bold">
           {member ? 'Edit Member' : 'Add New Member'}
         </h1>
         <p className="text-muted-foreground mt-2">
@@ -169,11 +169,11 @@ export function MemberForm({ member, onSave, onCancel }: MemberFormProps) {
             </div>
           </div>
 
-          <div className="flex space-x-4 pt-4">
+          <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 pt-4">
             <Button
               type="submit"
               disabled={loading}
-              className="bg-gradient-primary hover:opacity-90 transition-smooth"
+              className="bg-gradient-primary hover:opacity-90 transition-smooth w-full md:w-auto"
             >
               {loading ? 'Saving...' : member ? 'Update Member' : 'Add Member'}
             </Button>
@@ -182,6 +182,7 @@ export function MemberForm({ member, onSave, onCancel }: MemberFormProps) {
               variant="outline"
               onClick={onCancel}
               disabled={loading}
+              className="w-full md:w-auto"
             >
               Cancel
             </Button>
