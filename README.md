@@ -2,7 +2,7 @@
 
 > **[PREVIEW](https://dbms-with-n8n.vercel.app/)**
 
-A modern React application for database management, integrated with [n8n](https://n8n.io/) for backend and workflow automation. This project demonstrates how to connect a React frontend to n8n using webhooks, with configuration via environment variables.
+A modern Vite application for database management, integrated with [n8n](https://n8n.io/) for backend and workflow automation. This project demonstrates how to connect a Vite frontend to n8n using webhooks, with configuration via environment variables.
 
 > **This project can be completely self-hosted, giving you full control over your data and workflows.**
 
@@ -16,7 +16,7 @@ A modern React application for database management, integrated with [n8n](https:
 
 ## Features
 
-- React frontend built with TypeScript
+- Vite frontend built with TypeScript
 - Connects to n8n via configurable webhook endpoint
 - Secure environment variable management
 - Modular and scalable codebase
@@ -24,7 +24,7 @@ A modern React application for database management, integrated with [n8n](https:
 
 ## Tech Stack
 
-- **Frontend:** React, TypeScript, JavaScript
+- **Frontend:** Vite, TypeScript, JavaScript
 - **Automation:** n8n (via webhook)
 - **Package Manager:** npm
 

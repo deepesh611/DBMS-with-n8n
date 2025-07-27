@@ -66,7 +66,7 @@ export function useMembers() {
     try {
       setLoading(true)
       // Replace with your n8n webhook URL
-      const webhookUrl = process.env.REACT_APP_N8N_WEBHOOK_URL as string
+      const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL
 
       const response = await fetch(webhookUrl, {
         method: 'POST',
