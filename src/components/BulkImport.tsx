@@ -42,7 +42,8 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
         dob: row.dob || row.DOB || row['Date of Birth'] || '',
         address: row.address || row.Address || '',
         emergencyContact: row.emergencyContact || row['Emergency Contact'] || row['Alt Contact'] || '',
-        joinDate: row.joinDate || row['Join Date'] || new Date().toISOString().split('T')[0]
+        joinDate: row.joinDate || row['Join Date'] || new Date().toISOString().split('T')[0],
+        profilePicUrl: row.profilePicUrl || row['Profile Picture'] || row['Photo URL'] || ''
       }
 
       if (!member.name || !member.email || !member.dob || !member.address || !member.emergencyContact) {
@@ -253,7 +254,7 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
         <h1 className="text-3xl font-bold">Bulk Import Members</h1>
         <p className="text-muted-foreground">
           Import multiple members from CSV or XLSX files. Required columns: name, email, phone, dob, address, emergencyContact. 
-          Optional: joinDate.
+          Optional: joinDate, profilePicUrl.
         </p>
       </div>
 
@@ -296,7 +297,7 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
                   Make sure your file has columns: <strong>name, email, phone, dob, address, emergencyContact</strong> (all required), 
-                  plus optional: joinDate
+                  plus optional: joinDate, profilePicUrl
                 </AlertDescription>
               </Alert>
             </CardContent>
