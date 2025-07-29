@@ -39,14 +39,14 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
         name: row.name || row.Name || '',
         email: row.email || row.Email || '',
         phone: row.phone || row.Phone || '',
-        position: row.position || row.Position || '',
-        department: row.department || row.Department || '',
-        joinDate: row.joinDate || row['Join Date'] || new Date().toISOString().split('T')[0],
-        status: (row.status || row.Status || 'active') as 'active' | 'inactive' | 'pending'
+        dob: row.dob || row.DOB || row['Date of Birth'] || '',
+        address: row.address || row.Address || '',
+        emergencyContact: row.emergencyContact || row['Emergency Contact'] || row['Alt Contact'] || '',
+        joinDate: row.joinDate || row['Join Date'] || new Date().toISOString().split('T')[0]
       }
 
-      if (!member.name || !member.email) {
-        invalid.push(`Row ${index + 1}: Missing required fields (name, email)`)
+      if (!member.name || !member.email || !member.dob || !member.address || !member.emergencyContact) {
+        invalid.push(`Row ${index + 1}: Missing required fields (name, email, dob, address, emergencyContact)`)
       } else if (!/\S+@\S+\.\S+/.test(member.email)) {
         invalid.push(`Row ${index + 1}: Invalid email format`)
       } else {
@@ -252,8 +252,8 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
       <div className="space-y-4">
         <h1 className="text-3xl font-bold">Bulk Import Members</h1>
         <p className="text-muted-foreground">
-          Import multiple members from CSV or XLSX files. Required columns: name, email. 
-          Optional: phone, position, department, joinDate, status.
+          Import multiple members from CSV or XLSX files. Required columns: name, email, phone, dob, address, emergencyContact. 
+          Optional: joinDate.
         </p>
       </div>
 
@@ -295,8 +295,8 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  Make sure your file has columns: <strong>name</strong> and <strong>email</strong> (required), 
-                  plus optional: phone, position, department, joinDate, status
+                  Make sure your file has columns: <strong>name, email, phone, dob, address, emergencyContact</strong> (all required), 
+                  plus optional: joinDate
                 </AlertDescription>
               </Alert>
             </CardContent>

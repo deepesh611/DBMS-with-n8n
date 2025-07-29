@@ -64,21 +64,15 @@ export function Dashboard() {
                   </div>
                   <div className="min-w-0">
                     <p className="font-medium">{member.name}</p>
-                    <p className="text-sm text-muted-foreground">{member.position} • {member.department}</p>
+                    <p className="text-sm text-muted-foreground">{member.email}</p>
                   </div>
                 </div>
                 <div className="flex items-center justify-between md:block md:text-right">
                   <p className="text-sm text-muted-foreground">
                     Joined {new Date(member.joinDate).toLocaleDateString()}
                   </p>
-                  <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                    member.status === 'active' 
-                      ? 'bg-success/10 text-success'
-                      : member.status === 'pending'
-                      ? 'bg-warning/10 text-warning'
-                      : 'bg-muted text-muted-foreground'
-                  }`}>
-                    {member.status}
+                  <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-success/10 text-success">
+                    Active
                   </span>
                 </div>
               </div>

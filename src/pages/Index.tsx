@@ -6,6 +6,7 @@ import { Dashboard } from "@/components/Dashboard"
 import { MembersList } from "@/components/MembersList"
 import { MemberForm } from "@/components/MemberForm"
 import { BulkImport } from "@/components/BulkImport"
+import { Analytics } from "@/components/Analytics"
 import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -46,12 +47,7 @@ const Index = () => {
       case "bulk-import":
         return <BulkImport onImportComplete={() => setActiveTab("members")} />
       case "analytics":
-        return (
-          <div className="space-y-6">
-            <h1 className="text-3xl font-bold">Analytics</h1>
-            <p className="text-muted-foreground">Detailed analytics coming soon...</p>
-          </div>
-        )
+        return <Analytics />
       case "settings":
         return (
           <div className="space-y-6">

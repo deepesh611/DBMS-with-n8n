@@ -21,9 +21,9 @@ export function MemberForm({ member, onSave, onCancel }: MemberFormProps) {
     name: "",
     email: "",
     phone: "",
-    position: "",
-    department: "",
-    status: "active" as Member['status']
+    dob: "",
+    address: "",
+    emergencyContact: ""
   })
 
   useEffect(() => {
@@ -32,9 +32,9 @@ export function MemberForm({ member, onSave, onCancel }: MemberFormProps) {
         name: member.name,
         email: member.email,
         phone: member.phone,
-        position: member.position,
-        department: member.department,
-        status: member.status
+        dob: member.dob,
+        address: member.address,
+        emergencyContact: member.emergencyContact
       })
     }
   }, [member])
@@ -124,49 +124,37 @@ export function MemberForm({ member, onSave, onCancel }: MemberFormProps) {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="position">Position</Label>
+              <Label htmlFor="dob">Date of Birth</Label>
               <Input
-                id="position"
-                value={formData.position}
-                onChange={(e) => handleInputChange('position', e.target.value)}
-                placeholder="Enter position/role"
+                id="dob"
+                type="date"
+                value={formData.dob}
+                onChange={(e) => handleInputChange('dob', e.target.value)}
                 required
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="department">Department</Label>
-              <Select value={formData.department} onValueChange={(value) => handleInputChange('department', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select department" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Executive">Executive</SelectItem>
-                  <SelectItem value="Finance">Finance</SelectItem>
-                  <SelectItem value="Admin">Admin</SelectItem>
-                  <SelectItem value="Marketing">Marketing</SelectItem>
-                  <SelectItem value="Operations">Operations</SelectItem>
-                  <SelectItem value="HR">Human Resources</SelectItem>
-                  <SelectItem value="IT">Information Technology</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value as Member['status'])}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="address">Address</Label>
+            <Input
+              id="address"
+              value={formData.address}
+              onChange={(e) => handleInputChange('address', e.target.value)}
+              placeholder="Enter full address"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="emergencyContact">Emergency Contact Number</Label>
+            <Input
+              id="emergencyContact"
+              value={formData.emergencyContact}
+              onChange={(e) => handleInputChange('emergencyContact', e.target.value)}
+              placeholder="Enter emergency contact number"
+              required
+            />
           </div>
 
           <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 pt-4">

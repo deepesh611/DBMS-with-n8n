@@ -3,11 +3,11 @@ export interface Member {
   name: string
   email: string
   phone: string
-  position: string
-  department: string
+  dob: string
+  address: string
+  emergencyContact: string
   joinDate: string
-  status: 'active' | 'inactive' | 'pending'
-  avatar?: string
+  profilePicUrl?: string
 }
 
 export interface MemberStats {

@@ -32,8 +32,7 @@ export function MembersList({ onEditMember }: MembersListProps) {
   const filteredMembers = members.filter(member =>
     member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.position.toLowerCase().includes(searchTerm.toLowerCase())
+    member.phone.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   const handleDeleteMember = async () => {
@@ -57,13 +56,9 @@ export function MembersList({ onEditMember }: MembersListProps) {
     }
   }
 
-  const getStatusBadge = (status: Member['status']) => {
-    const variants = {
-      active: "bg-success/10 text-success hover:bg-success/20",
-      inactive: "bg-muted text-muted-foreground hover:bg-muted/80",
-      pending: "bg-warning/10 text-warning hover:bg-warning/20"
-    }
-    return variants[status]
+  // All members are considered active now
+  const getStatusBadge = () => {
+    return "bg-success/10 text-success hover:bg-success/20"
   }
 
   return (
@@ -101,7 +96,7 @@ export function MembersList({ onEditMember }: MembersListProps) {
                   <div className="space-y-1 min-w-0 flex-1">
                     <h3 className="font-semibold">{member.name}</h3>
                     <p className="text-sm text-muted-foreground">
-                      {member.position} • {member.department}
+                      Born: {new Date(member.dob).toLocaleDateString()}
                     </p>
                     <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-1 md:space-y-0 text-sm text-muted-foreground">
                       <div className="flex items-center space-x-1">
@@ -118,8 +113,8 @@ export function MembersList({ onEditMember }: MembersListProps) {
                 
                 <div className="flex flex-col md:flex-row md:items-center space-y-3 md:space-y-0 md:space-x-4">
                   <div className="flex items-center justify-between md:block md:text-right space-y-1">
-                    <Badge className={getStatusBadge(member.status)}>
-                      {member.status}
+                    <Badge className={getStatusBadge()}>
+                      Active
                     </Badge>
                     <p className="text-xs text-muted-foreground md:mt-1">
                       Joined {new Date(member.joinDate).toLocaleDateString()}
