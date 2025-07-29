@@ -23,8 +23,11 @@ export function MemberForm({ member, onSave, onCancel }: MemberFormProps) {
     phone: "",
     dob: "",
     address: "",
-    emergencyContact: ""
+    emergencyContact: "",
+    profilePicUrl: ""
   })
+  const [profilePicFile, setProfilePicFile] = useState<File | null>(null)
+  const [profilePicPreview, setProfilePicPreview] = useState<string>("")
 
   useEffect(() => {
     if (member) {
@@ -34,10 +37,24 @@ export function MemberForm({ member, onSave, onCancel }: MemberFormProps) {
         phone: member.phone,
         dob: member.dob,
         address: member.address,
-        emergencyContact: member.emergencyContact
+        emergencyContact: member.emergencyContact,
+        profilePicUrl: member.profilePicUrl || ""
       })
+      setProfilePicPreview(member.profilePicUrl || "")
     }
   }, [member])
+
+  const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setProfilePicFile(file)
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        setProfilePicPreview(event.target?.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -86,6 +103,34 @@ export function MemberForm({ member, onSave, onCancel }: MemberFormProps) {
 
       <Card className="bg-gradient-card border-0 shadow-elegant max-w-2xl">
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Profile Picture Section */}
+          <div className="space-y-4">
+            <Label htmlFor="profilePic">Profile Picture</Label>
+            <div className="flex items-center space-x-4">
+              {profilePicPreview && (
+                <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-border">
+                  <img 
+                    src={profilePicPreview} 
+                    alt="Profile preview" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
+              <div className="flex-1">
+                <Input
+                  id="profilePic"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleProfilePicChange}
+                  className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+                />
+                <p className="text-sm text-muted-foreground mt-1">
+                  Upload a profile picture (JPG, PNG, or GIF)
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
