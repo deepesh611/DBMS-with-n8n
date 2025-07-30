@@ -172,6 +172,18 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
     }
   }
 
+  const convertGoogleSheetsUrl = (url: string): string => {
+    // Convert Google Sheets URL to CSV export format
+    if (url.includes('docs.google.com/spreadsheets')) {
+      const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/)
+      if (match) {
+        const fileId = match[1]
+        return `https://docs.google.com/spreadsheets/d/${fileId}/export?format=csv`
+      }
+    }
+    return url
+  }
+
   const handleLinkImport = async () => {
     if (!linkUrl) {
       toast({
@@ -184,14 +196,31 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
 
     try {
       setIsLoading(true)
-      const response = await fetch(linkUrl)
-      const text = await response.text()
       
-      const isCSV = linkUrl.toLowerCase().includes('.csv') || response.headers.get('content-type')?.includes('text/csv')
+      // Convert Google Sheets URL to exportable format
+      const processedUrl = convertGoogleSheetsUrl(linkUrl)
+      
+      const response = await fetch(processedUrl, {
+        mode: 'cors',
+        headers: {
+          'Accept': 'text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,*/*'
+        }
+      })
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
+      const contentType = response.headers.get('content-type') || ''
+      const isCSV = processedUrl.toLowerCase().includes('.csv') || 
+                   contentType.includes('text/csv') || 
+                   processedUrl.includes('export?format=csv')
       
       if (isCSV) {
+        const text = await response.text()
         Papa.parse(text, {
           header: true,
+          skipEmptyLines: true,
           complete: (results) => {
             const { valid, invalid } = validateMemberData(results.data)
             
@@ -241,7 +270,7 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to fetch or process file from URL",
+        description: error instanceof Error ? error.message : "Failed to fetch or process file from URL. Make sure the Google Sheet is shared publicly.",
         variant: "destructive",
       })
       setIsLoading(false)
@@ -312,7 +341,7 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
                 Import from URL
               </CardTitle>
               <CardDescription>
-                Enter a direct link to a CSV or XLSX file
+                Enter a direct link to a CSV/XLSX file or Google Sheets URL
               </CardDescription>
             </CardHeader>
 
@@ -322,7 +351,7 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
                 <Input
                   id="url"
                   type="url"
-                  placeholder="https://example.com/members.csv"
+                  placeholder="https://docs.google.com/spreadsheets/d/... or https://example.com/members.csv"
                   value={linkUrl}
                   onChange={(e) => setLinkUrl(e.target.value)}
                   disabled={isLoading}
@@ -333,7 +362,7 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
                   Make sure your file has columns: <strong>name, email, phone, dob, address, emergencyContact</strong> (all required),
-                  plus optional: joinDate, profilePicUrl
+                  plus optional: joinDate, profilePicUrl. For Google Sheets, ensure the sheet is shared publicly or with "Anyone with the link can view".
                 </AlertDescription>
               </Alert>
               
