@@ -51,7 +51,7 @@ export function Analytics() {
     }
     
     loadMembers()
-  }, [fetchAllMembers, toast])
+  }, []) // Empty dependency array - runs only once on mount
 
   const handleRefresh = async () => {
     setRefreshing(true)

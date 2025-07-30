@@ -29,7 +29,7 @@ export function MembersList({ onEditMember }: MembersListProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null)
 
-  // Fetch members from database on component mount
+  // Fetch members from database once on component mount
   useEffect(() => {
     const loadMembers = async () => {
       try {
@@ -44,7 +44,7 @@ export function MembersList({ onEditMember }: MembersListProps) {
     }
     
     loadMembers()
-  }, [fetchAllMembers, toast])
+  }, []) // Empty dependency array - runs only once on mount
 
   const handleRefreshData = async () => {
     try {
