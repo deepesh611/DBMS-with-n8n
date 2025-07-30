@@ -368,20 +368,32 @@ export function Analytics() {
                 Members with Phone
               </div>
             </div>
-            <div className="text-center p-4 bg-secondary/30 rounded-lg">
-              <div className="text-2xl font-bold text-primary">
-                {members.filter(m => m.emergencyContact).length}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                Emergency Contacts
-              </div>
-            </div>
+
+            {/*<div className="text-center p-4 bg-secondary/30 rounded-lg">*/}
+            {/*  <div className="text-2xl font-bold text-primary">*/}
+            {/*    {members.filter(m => m.emergencyContact).length}*/}
+            {/*  </div>*/}
+            {/*  <div className="text-sm text-muted-foreground">*/}
+            {/*    Emergency Contacts*/}
+            {/*  </div>*/}
+            {/*</div>*/}
+
             <div className="text-center p-4 bg-secondary/30 rounded-lg">
               <div className="text-2xl font-bold text-primary">
                 {new Set(members.map(m => m.address.split(',')[1]?.trim())).size}
               </div>
               <div className="text-sm text-muted-foreground">
                 Unique Cities
+              </div>
+            </div>
+
+          {/*  Recently Joined Members */}
+            <div className="text-center p-4 bg-secondary/30 rounded-lg">
+              <div className="text-2xl font-bold text-primary">
+                {members.filter(m => new Date(m.joinDate) >= new Date(new Date().setMonth(new Date().getMonth() - 1))).length}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Joined Last Month
               </div>
             </div>
           </div>
