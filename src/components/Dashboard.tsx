@@ -2,9 +2,30 @@ import { Users, UserCheck, UserPlus, Building2 } from "lucide-react"
 import { StatCard } from "@/components/StatCard"
 import { useMembers } from "@/hooks/use-members"
 import { Card } from "@/components/ui/card"
+import { useEffect } from "react"
+import { useToast } from "@/hooks/use-toast"
 
 export function Dashboard() {
-    const { stats, members } = useMembers()
+    const { stats, members, fetchAllMembers } = useMembers()
+    const { toast } = useToast()
+
+    // Fetch members from database once on component mount
+    useEffect(() => {
+        const loadMembers = async () => {
+            try {
+                await fetchAllMembers()
+            } catch (error) {
+                console.error('Failed to fetch members:', error)
+                toast({
+                    title: "Error",
+                    description: "Failed to load member data",
+                    variant: "destructive",
+                })
+            }
+        }
+        
+        loadMembers()
+    }, []) // Empty dependency array - runs only once on mount
 
     const recentMembers = members
         .sort((a, b) => new Date(b.joinDate).getTime() - new Date(a.joinDate).getTime())
