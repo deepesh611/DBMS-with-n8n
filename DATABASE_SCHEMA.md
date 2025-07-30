@@ -12,7 +12,7 @@ CREATE TABLE members (
     address TEXT NOT NULL,
     emergency_contact VARCHAR(50) NOT NULL,
     join_date DATE NOT NULL,
-    profile_pic_url VARCHAR(500),
+    profile_pic VARCHAR(500),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -30,7 +30,7 @@ CREATE TABLE members (
 | `address` | TEXT | Yes | Full address |
 | `emergency_contact` | VARCHAR(50) | Yes | Emergency contact phone number |
 | `join_date` | DATE | Yes | Date when member joined |
-| `profile_pic_url` | VARCHAR(500) | No | URL to profile picture |
+| `profile_pic` | VARCHAR(500) | No | URL to profile picture |
 | `created_at` | TIMESTAMP | Auto | Record creation timestamp |
 | `updated_at` | TIMESTAMP | Auto | Record last update timestamp |
 
@@ -45,7 +45,7 @@ CREATE TABLE members (
 - `dob` - Date of birth for age analytics
 - `address` - Full address for geographic insights
 - `emergency_contact` - Emergency contact number
-- `profile_pic_url` - URL reference to profile picture
+- `profile_pic` - URL reference to profile picture
 
 ## Profile Picture Storage Strategy
 

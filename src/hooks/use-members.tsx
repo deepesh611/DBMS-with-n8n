@@ -65,7 +65,6 @@ export function useMembers() {
   const sendToN8N = async (action: string, data: any) => {
     try {
       setLoading(true)
-      // Replace with your n8n webhook URL
       const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL
 
       const response = await fetch(webhookUrl, {
@@ -122,8 +121,11 @@ export function useMembers() {
   }
 
   const deleteMember = async (id: string) => {
+    const member = members.find(m => m.id === id)
+    const email = member?.email
+
     try {
-      await sendToN8N('delete', { id })
+      await sendToN8N('delete', { id, email })
       setMembers(prev => prev.filter(m => m.id !== id))
     } catch (error) {
       // For demo purposes, still delete locally if webhook fails

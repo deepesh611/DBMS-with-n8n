@@ -315,6 +315,7 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
                 Enter a direct link to a CSV or XLSX file
               </CardDescription>
             </CardHeader>
+
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="url">File URL</Label>
@@ -327,6 +328,14 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
                   disabled={isLoading}
                 />
               </div>
+
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Make sure your file has columns: <strong>name, email, phone, dob, address, emergencyContact</strong> (all required),
+                  plus optional: joinDate, profilePicUrl
+                </AlertDescription>
+              </Alert>
               
               <Button 
                 onClick={handleLinkImport} 
