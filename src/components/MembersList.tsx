@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react"
-import { Search, Edit, Trash2, Mail, Phone } from "lucide-react"
+import { useState } from "react"
+import { Search, Edit, Trash2, Mail, Phone, RefreshCw } from "lucide-react"
 import { useMembers } from "@/hooks/use-members"
 import { Member } from "@/types/member"
 import { Card } from "@/components/ui/card"
@@ -29,22 +29,21 @@ export function MembersList({ onEditMember }: MembersListProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null)
 
-  // Fetch members from database on component mount
-  useEffect(() => {
-    const loadMembers = async () => {
-      try {
-        await fetchAllMembers()
-      } catch (error) {
-        toast({
-          title: "Warning",
-          description: "Failed to fetch members from database. Using local data.",
-          variant: "destructive",
-        })
-      }
+  const handleRefreshData = async () => {
+    try {
+      await fetchAllMembers()
+      toast({
+        title: "Data refreshed",
+        description: "Member data has been successfully updated.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to refresh member data. Please try again.",
+        variant: "destructive",
+      })
     }
-    
-    loadMembers()
-  }, [fetchAllMembers, toast])
+  }
 
   const filteredMembers = members.filter(member =>
     member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -87,14 +86,26 @@ export function MembersList({ onEditMember }: MembersListProps) {
             Manage your organization's members
           </p>
         </div>
-        <div className="relative w-full md:w-64">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search members..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefreshData}
+            disabled={loading}
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+          <div className="relative w-full md:w-64">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search members..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
         </div>
       </div>
 
