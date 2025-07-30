@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Search, Edit, Trash2, Mail, Phone, RefreshCw } from "lucide-react"
 import { useMembers } from "@/hooks/use-members"
 import { Member } from "@/types/member"
@@ -28,6 +28,23 @@ export function MembersList({ onEditMember }: MembersListProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [memberToDelete, setMemberToDelete] = useState<string | null>(null)
+
+  // Fetch members from database on component mount
+  useEffect(() => {
+    const loadMembers = async () => {
+      try {
+        await fetchAllMembers()
+      } catch (error) {
+        toast({
+          title: "Warning",
+          description: "Failed to fetch members from database. Using local data.",
+          variant: "destructive",
+        })
+      }
+    }
+    
+    loadMembers()
+  }, [fetchAllMembers, toast])
 
   const handleRefreshData = async () => {
     try {

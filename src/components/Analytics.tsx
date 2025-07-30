@@ -36,6 +36,23 @@ export function Analytics() {
   const { toast } = useToast()
   const [refreshing, setRefreshing] = useState(false)
 
+  // Fetch members from database on component mount
+  useEffect(() => {
+    const loadMembers = async () => {
+      try {
+        await fetchAllMembers()
+      } catch (error) {
+        toast({
+          title: "Warning",
+          description: "Failed to fetch analytics data from database. Using local data.",
+          variant: "destructive",
+        })
+      }
+    }
+    
+    loadMembers()
+  }, [fetchAllMembers, toast])
+
   const handleRefresh = async () => {
     setRefreshing(true)
     try {
