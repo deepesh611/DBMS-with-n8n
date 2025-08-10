@@ -4,7 +4,8 @@ Below is the finalized schema for a locally hosted MySQL database. It models cor
 
 ---
 
--- Main members table
+## Main members table
+```sql
 CREATE TABLE members (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     title ENUM('Mr', 'Ms', 'Mrs', 'Dr') NOT NULL,
@@ -19,7 +20,7 @@ CREATE TABLE members (
     baptism_country VARCHAR(100),
     family_status ENUM('Here', 'Origin Country') DEFAULT 'Here',
     carsel VARCHAR(255),
-    local_address TEXT NULL,
+    local_address TEXT,
     church_joining_date DATE NOT NULL,
     profile_pic VARCHAR(500),
     family_photo VARCHAR(500),
@@ -30,8 +31,10 @@ CREATE TABLE members (
     INDEX idx_family (family_name),
     INDEX idx_joining_date (church_joining_date)
 );
+```
 
--- Phone numbers (normalized - one member can have multiple phone types)
+## Phone numbers (normalized - one member can have multiple phone types)
+```sql
 CREATE TABLE member_phones (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     member_id INT UNSIGNED NOT NULL,
@@ -44,8 +47,10 @@ CREATE TABLE member_phones (
     UNIQUE KEY unique_member_phone_type (member_id, phone_type),
     INDEX idx_member_phones (member_id)
 );
+```
 
--- Employment information
+## Employment information
+```sql
 CREATE TABLE member_employment (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     member_id INT UNSIGNED NOT NULL,
@@ -62,8 +67,10 @@ CREATE TABLE member_employment (
     INDEX idx_member_employment (member_id),
     INDEX idx_profession (profession)
 );
+```
 
--- Family relationships
+## Family relationships
+```sql
 CREATE TABLE family_relationships (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     member_id INT UNSIGNED NOT NULL,
@@ -77,8 +84,10 @@ CREATE TABLE family_relationships (
     INDEX idx_member_relationships (member_id),
     INDEX idx_family_connections (related_member_id)
 );
+```
 
--- Useful views for common queries
+## Useful views for common queries
+```sql
 CREATE VIEW member_summary AS
 SELECT 
     m.id,
@@ -98,8 +107,10 @@ FROM members m
 LEFT JOIN member_employment me ON m.id = me.member_id AND me.is_current = TRUE
 LEFT JOIN member_phones mp ON m.id = mp.member_id AND mp.is_active = TRUE
 GROUP BY m.id;
+```
 
--- Family tree view
+## Family tree view
+```sql
 CREATE VIEW family_tree AS
 SELECT 
     m1.id as member_id,
@@ -111,16 +122,18 @@ SELECT
 FROM members m1
 JOIN family_relationships fr ON m1.id = fr.member_id
 JOIN members m2 ON fr.related_member_id = m2.id;
+```
 
 ---
 
-n8n webhook actions (suggested):
+## n8n webhook actions (suggested):
 - CREATE_MEMBER: Insert into members, member_phones, member_employment, and optionally create related members + family_relationships
 - UPDATE_MEMBER: Update base member + upsert phones/employment
 - DELETE_MEMBER: Cascade delete via FK
 - FETCH_ALL_MEMBERS: Return array from member_summary view
 - FETCH_MEMBER_DETAILS: Return full joined details for a single member
 
+```
 Sample payload for CREATE_MEMBER (frontend → n8n):
 {
   "action": "CREATE_MEMBER",
@@ -137,3 +150,4 @@ Sample payload for CREATE_MEMBER (frontend → n8n):
     ]
   }
 }
+```
