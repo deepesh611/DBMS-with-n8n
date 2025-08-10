@@ -1,128 +1,128 @@
-// New complex member types for the updated database schema
+// Types aligned with the MySQL schema + n8n payloads
 
-export interface Member {
-  id: string
-  first_name: string
-  last_name: string
-  email: string
-  phone: string
-  dob: string
-  gender: 'male' | 'female' | 'other'
-  marital_status: 'single' | 'married' | 'divorced' | 'widowed'
-  profile_pic?: string
-  join_date: string
-  status: 'active' | 'inactive' | 'suspended'
-  created_at?: string
-  updated_at?: string
-  
-  // Related data
-  addresses: MemberAddress[]
-  emergency_contacts: EmergencyContact[]
-  family_members: FamilyMember[]
-  employment?: MemberEmployment
-  skills: MemberSkill[]
-}
+export type Title = 'Mr' | 'Ms' | 'Mrs' | 'Dr'
+export type FamilyStatus = 'Here' | 'Origin Country'
+export type PhoneType = 'Primary' | 'WhatsApp' | 'Emergency' | 'Origin Country'
+export type RelationshipType = 'Spouse' | 'Child' | 'Parent' | 'Sibling' | 'Other'
 
-export interface MemberAddress {
+export interface MemberPhone {
   id?: string
-  member_id?: string
-  address_type: 'home' | 'work' | 'mailing'
-  street_address: string
-  city: string
-  state: string
-  postal_code: string
-  country: string
-  is_primary: boolean
-  created_at?: string
-}
-
-export interface EmergencyContact {
-  id?: string
-  member_id?: string
-  contact_name: string
-  relationship: string
-  phone: string
-  email?: string
-  is_primary: boolean
-  created_at?: string
-}
-
-export interface FamilyMember {
-  id?: string
-  member_id?: string
-  family_member_name: string
-  relationship: 'spouse' | 'child' | 'parent' | 'sibling' | 'other'
-  dob?: string
-  phone?: string
-  email?: string
+  member_id?: string | number
+  phone_type: PhoneType
+  phone_number: string
+  is_active?: boolean
   created_at?: string
 }
 
 export interface MemberEmployment {
   id?: string
-  member_id?: string
-  company_name: string
-  job_title: string
-  department?: string
-  employment_type: 'full_time' | 'part_time' | 'contract' | 'freelance' | 'retired' | 'unemployed'
-  start_date?: string
-  end_date?: string
-  salary_range?: 'below_30k' | '30k_50k' | '50k_75k' | '75k_100k' | 'above_100k'
-  is_current: boolean
+  member_id?: string | number
+  company_name?: string
+  designation?: string
+  profession?: string
+  is_employed: boolean
+  employment_start_date?: string
+  is_current?: boolean
   created_at?: string
+  updated_at?: string
 }
 
-export interface MemberSkill {
+export interface FamilyRelationship {
   id?: string
-  member_id?: string
-  skill_name: string
-  skill_level: 'beginner' | 'intermediate' | 'advanced' | 'expert'
-  category: 'technical' | 'professional' | 'hobby' | 'language' | 'other'
+  member_id?: string | number
+  related_member_id?: string | number
+  relationship_type: RelationshipType
   created_at?: string
+  // For creation convenience (n8n can create related member and return id)
+  related_member?: Partial<Member>
+}
+
+export interface Member {
+  id: string | number
+  title: Title
+  first_name: string
+  middle_name?: string
+  last_name: string
+  family_name?: string
+  dob: string
+  email?: string
+  baptism_date?: string
+  baptism_church?: string
+  baptism_country?: string
+  family_status: FamilyStatus
+  carsel?: string
+  local_address?: string
+  church_joining_date: string
+  profile_pic?: string
+  family_photo?: string
+  created_at?: string
+  updated_at?: string
+
+  // Related collections
+  phones: MemberPhone[]
+  employment?: MemberEmployment | null
+  relationships: FamilyRelationship[]
 }
 
 export interface MemberStats {
   totalMembers: number
-  activeMembers: number
+  activeMembers: number // Treat all as active for now
   newThisMonth: number
-  departments: number
+  departments: number // Using unique professions count here
 }
 
-// Form data interface for creating/updating members
+// Dynamic, multi-step Add/Edit form data
 export interface MemberFormData {
-  // Basic info
+  // Step 1: Basic info
+  title: Title
   first_name: string
+  middle_name?: string
   last_name: string
-  email: string
-  phone: string
+  family_name?: string
   dob: string
-  gender: 'male' | 'female' | 'other'
-  marital_status: 'single' | 'married' | 'divorced' | 'widowed'
-  
-  // Single primary address
-  street_address: string
-  city: string
-  state: string
-  postal_code: string
-  country: string
-  
-  // Single primary emergency contact
-  emergency_contact_name: string
-  emergency_relationship: string
-  emergency_phone: string
-  emergency_email?: string
-  
-  // Employment (optional)
+  email?: string
+  family_status: FamilyStatus
+  carsel?: string
+  local_address?: string
+  church_joining_date: string
+
+  // Step 2: Baptism
+  baptism_date?: string
+  baptism_church?: string
+  baptism_country?: string
+
+  // Step 3: Phones
+  primary_phone?: string
+  whatsapp_phone?: string
+  emergency_phone?: string
+  origin_phone?: string
+
+  // Step 4: Employment
+  is_employed: boolean
   company_name?: string
-  job_title?: string
-  department?: string
-  employment_type?: 'full_time' | 'part_time' | 'contract' | 'freelance' | 'retired' | 'unemployed'
-  start_date?: string
-  salary_range?: 'below_30k' | '30k_50k' | '50k_75k' | '75k_100k' | 'above_100k'
-  
-  // Additional arrays for multiple entries (handled separately)
-  additional_addresses?: MemberAddress[]
-  additional_contacts?: EmergencyContact[]
-  family_members?: FamilyMember[]
-  skills?: MemberSkill[]
+  designation?: string
+  profession?: string
+  employment_start_date?: string
+
+  // Step 5: Family (conditional)
+  is_married?: boolean
+  spouse?: {
+    title: Title
+    first_name: string
+    middle_name?: string
+    last_name: string
+    dob?: string
+    email?: string
+  }
+  children?: Array<{
+    title: Title
+    first_name: string
+    last_name: string
+    dob?: string
+    email?: string
+  }>
+
+  // Images (URLs or base64 for now)
+  profile_pic?: string
+  family_photo?: string
 }

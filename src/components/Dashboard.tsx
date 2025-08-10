@@ -1,6 +1,6 @@
 import { Users, UserCheck, UserPlus, Building2 } from "lucide-react"
 import { StatCard } from "@/components/StatCard"
-import { useMembers } from "@/hooks/use-members"
+import { useMembers } from "@/hooks/use-members-new"
 import { Card } from "@/components/ui/card"
 import { useEffect } from "react"
 import { useToast } from "@/hooks/use-toast"
@@ -28,7 +28,7 @@ export function Dashboard() {
     }, []) // Empty dependency array - runs only once on mount
 
     const recentMembers = members
-        .sort((a, b) => new Date(b.joinDate).getTime() - new Date(a.joinDate).getTime())
+        .sort((a, b) => new Date(b.church_joining_date).getTime() - new Date(a.church_joining_date).getTime())
         .slice(0, 5)
 
     return (
@@ -81,16 +81,16 @@ export function Dashboard() {
                             <div key={member.id} className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-secondary/50 rounded-lg gap-3">
                                 <div className="flex items-center space-x-4">
                                     <div className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold flex-shrink-0">
-                                        {member.name.split(' ').map(n => n[0]).join('')}
+                                        {(member.first_name[0] || '') + (member.last_name[0] || '')}
                                     </div>
                                     <div className="min-w-0">
-                                        <p className="font-medium">{member.name}</p>
+                                        <p className="font-medium">{`${member.first_name} ${member.last_name}`.trim()}</p>
                                         <p className="text-sm text-muted-foreground">{member.email}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center justify-between md:block md:text-right">
                                     <p className="text-sm text-muted-foreground">
-                                        Joined {new Date(member.joinDate).toLocaleDateString()}
+                                        Joined {new Date(member.church_joining_date).toLocaleDateString()}
                                     </p>
                                     <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-success/10 text-success">
                     Active

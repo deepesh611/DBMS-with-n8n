@@ -1,10 +1,10 @@
 import { useState } from "react"
-import { Member } from "@/types/member"
+import { Member } from "@/types/member-new"
 import { Sidebar } from "@/components/Sidebar"
 import { ThemeToggle } from "@/components/ThemeToggle"
 import { Dashboard } from "@/components/Dashboard"
 import { MembersList } from "@/components/MembersList"
-import { MemberForm } from "@/components/MemberForm"
+import { MemberFormNew } from "@/components/MemberFormNew"
 import { BulkImport } from "@/components/BulkImport"
 import { Analytics } from "@/components/Analytics"
 import { Menu } from "lucide-react"
@@ -38,7 +38,7 @@ const Index = () => {
         return <MembersList onEditMember={handleEditMember} />
       case "add-member":
         return (
-          <MemberForm
+          <MemberFormNew
             member={editingMember}
             onSave={handleSaveMember}
             onCancel={handleCancelEdit}

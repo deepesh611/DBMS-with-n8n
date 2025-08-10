@@ -8,8 +8,8 @@ import { Upload, Link, FileSpreadsheet, AlertCircle, CheckCircle } from 'lucide-
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Progress } from '@/components/ui/progress'
 import { useToast } from '@/hooks/use-toast'
-import { useMembers } from '@/hooks/use-members'
-import { Member } from '@/types/member'
+import { useMembers } from '@/hooks/use-members-new'
+import { MemberFormData } from '@/types/member-new'
 import Papa from 'papaparse'
 import * as XLSX from 'xlsx'
 
@@ -30,38 +30,61 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
   const { toast } = useToast()
   const { addMember } = useMembers()
 
-  const validateMemberData = (data: any[]): { valid: Omit<Member, 'id'>[]; invalid: string[] } => {
-    const valid: Omit<Member, 'id'>[] = []
+  const validateMemberData = (data: any[]): { valid: MemberFormData[]; invalid: string[] } => {
+    const valid: MemberFormData[] = []
     const invalid: string[] = []
 
     data.forEach((row, index) => {
-      const member = {
-        name: row.name || row.Name || '',
-        email: row.email || row.Email || '',
-        phone: row.phone || row.Phone || '',
-        dob: row.dob || row.DOB || row['Date of Birth'] || '',
-        address: row.address || row.Address || '',
-        emergencyContact: row.emergencyContact || row['Emergency Contact'] || row['Alt Contact'] || '',
-        joinDate: row.joinDate || row['Join Date'] || new Date().toISOString().split('T')[0],
-        profilePicUrl: row.profilePicUrl || row['Profile Picture'] || row['Photo URL'] || ''
+      // Try to split name if provided
+      const fullName = row.name || row.Name
+      let first = row.first_name || row.FirstName || row.firstName
+      let last = row.last_name || row.LastName || row.lastName
+      if ((!first || !last) && typeof fullName === 'string') {
+        const parts = fullName.trim().split(/\s+/)
+        first = first || parts[0]
+        last = last || parts.slice(1).join(' ')
       }
 
-      if (!member.name || !member.email || !member.dob || !member.address || !member.emergencyContact) {
-        invalid.push(`Row ${index + 1}: Missing required fields (name, email, dob, address, emergencyContact)`)
-      } else if (!/\S+@\S+\.\S+/.test(member.email)) {
-        invalid.push(`Row ${index + 1}: Invalid email format`)
+      const form: MemberFormData = {
+        title: (row.title || row.Title || 'Mr') as any,
+        first_name: first || '',
+        middle_name: row.middle_name || row.MiddleName || '',
+        last_name: last || '',
+        family_name: row.family_name || row.FamilyName || '',
+        dob: row.dob || row.DOB || row['Date of Birth'] || '',
+        email: row.email || row.Email || '',
+        family_status: (row.family_status || row.FamilyStatus || 'Here') as any,
+        carsel: row.carsel || '',
+        local_address: row.local_address || row.address || row.Address || '',
+        church_joining_date: row.church_joining_date || row.joinDate || new Date().toISOString().split('T')[0],
+        baptism_date: row.baptism_date || '',
+        baptism_church: row.baptism_church || '',
+        baptism_country: row.baptism_country || '',
+        primary_phone: row.primary_phone || row.phone || row.Phone || '',
+        whatsapp_phone: row.whatsapp_phone || '',
+        emergency_phone: row.emergency_phone || row.emergencyContact || row['Emergency Contact'] || '',
+        origin_phone: row.origin_phone || '',
+        is_employed: ['true','1','yes','y','True','TRUE'].includes(String(row.is_employed).trim()),
+        company_name: row.company_name || '',
+        designation: row.designation || '',
+        profession: row.profession || '',
+        employment_start_date: row.employment_start_date || ''
+      }
+
+      if (!form.first_name || !form.last_name || !form.dob) {
+        invalid.push(`Row ${index + 1}: Missing required fields (first_name, last_name, dob)`) 
       } else {
-        valid.push(member)
+        valid.push(form)
       }
     })
 
     return { valid, invalid }
   }
 
-  const processImport = async (data: Omit<Member, 'id'>[]) => {
+  const processImport = async (data: MemberFormData[]) => {
     setIsLoading(true)
     setProgress(0)
-    
+
     const results = {
       success: 0,
       failed: 0,
@@ -74,15 +97,16 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
         results.success++
       } catch (error) {
         results.failed++
-        results.errors.push(`Failed to add ${data[i].name}: ${error instanceof Error ? error.message : 'Unknown error'}`)
+        const name = `${data[i].first_name} ${data[i].last_name}`.trim()
+        results.errors.push(`Failed to add ${name || 'member'}: ${error instanceof Error ? error.message : 'Unknown error'}`)
       }
-      
+
       setProgress(((i + 1) / data.length) * 100)
     }
 
     setImportResults(results)
     setIsLoading(false)
-    
+
     if (results.success > 0) {
       toast({
         title: "Import Complete",
@@ -282,8 +306,7 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
       <div className="space-y-4">
         <h1 className="text-3xl font-bold">Bulk Import Members</h1>
         <p className="text-muted-foreground">
-          Import multiple members from CSV or XLSX files. Required columns: name, email, phone, dob, address, emergencyContact. 
-          Optional: joinDate, profilePicUrl.
+          Required columns: first_name, last_name, dob. Optional: title, email, church_joining_date, phones, baptism and employment fields.
         </p>
       </div>
 
@@ -325,8 +348,7 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  Make sure your file has columns: <strong>name, email, phone, dob, address, emergencyContact</strong> (all required), 
-                  plus optional: joinDate, profilePicUrl
+                  Make sure your file has columns: <strong>first_name, last_name, dob</strong> (required). Optional: title, email, family_status, church_joining_date, local_address, carsel, primary_phone, whatsapp_phone, emergency_phone, origin_phone, baptism_*, employment_*.
                 </AlertDescription>
               </Alert>
             </CardContent>
@@ -361,8 +383,7 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  Make sure your file has columns: <strong>name, email, phone, dob, address, emergencyContact</strong> (all required),
-                  plus optional: joinDate, profilePicUrl. For Google Sheets, ensure the sheet is shared publicly or with "Anyone with the link can view".
+                  Make sure your file has columns: <strong>first_name, last_name, dob</strong> (required). Optional similar to the file upload.
                 </AlertDescription>
               </Alert>
               

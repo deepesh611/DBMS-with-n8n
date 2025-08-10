@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { Search, Edit, Trash2, Mail, Phone, RefreshCw } from "lucide-react"
-import { useMembers } from "@/hooks/use-members"
-import { Member } from "@/types/member"
+import { useMembers } from "@/hooks/use-members-new"
+import { Member } from "@/types/member-new"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -27,7 +27,7 @@ export function MembersList({ onEditMember }: MembersListProps) {
   const { toast } = useToast()
   const [searchTerm, setSearchTerm] = useState("")
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [memberToDelete, setMemberToDelete] = useState<string | null>(null)
+  const [memberToDelete, setMemberToDelete] = useState<string | number | null>(null)
 
   // Fetch members from database once on component mount
   useEffect(() => {
@@ -62,10 +62,13 @@ export function MembersList({ onEditMember }: MembersListProps) {
     }
   }
 
+  const getFullName = (m: Member) => `${m.first_name} ${m.last_name}`.trim()
+  const getPrimaryPhone = (m: Member) => m.phones.find(p => p.phone_type === 'Primary')?.phone_number || ''
+
   const filteredMembers = members.filter(member =>
-    member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.phone.toLowerCase().includes(searchTerm.toLowerCase())
+    getFullName(member).toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (member.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    getPrimaryPhone(member).toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   const handleDeleteMember = async () => {
@@ -136,10 +139,10 @@ export function MembersList({ onEditMember }: MembersListProps) {
               >
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold text-lg flex-shrink-0">
-                    {member.name.split(' ').map(n => n[0]).join('')}
+                    {`${member.first_name[0] || ''}${member.last_name[0] || ''}`}
                   </div>
                   <div className="space-y-1 min-w-0 flex-1">
-                    <h3 className="font-semibold">{member.name}</h3>
+                    <h3 className="font-semibold">{getFullName(member)}</h3>
                     <p className="text-sm text-muted-foreground">
                       Born: {new Date(member.dob).toLocaleDateString()}
                     </p>
@@ -150,7 +153,7 @@ export function MembersList({ onEditMember }: MembersListProps) {
                       </div>
                       <div className="flex items-center space-x-1">
                         <Phone className="h-3 w-3 flex-shrink-0" />
-                        <span>{member.phone}</span>
+                        <span>{getPrimaryPhone(member)}</span>
                       </div>
                     </div>
                   </div>
@@ -162,7 +165,7 @@ export function MembersList({ onEditMember }: MembersListProps) {
                       Active
                     </Badge>
                     <p className="text-xs text-muted-foreground md:mt-1">
-                      Joined {new Date(member.joinDate).toLocaleDateString()}
+                      Joined {new Date(member.church_joining_date).toLocaleDateString()}
                     </p>
                   </div>
                   
