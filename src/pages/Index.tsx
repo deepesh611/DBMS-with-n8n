@@ -9,6 +9,7 @@ import { BulkImport } from "@/components/BulkImport"
 import { Analytics } from "@/components/Analytics"
 import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Settings as SettingsPage } from "@/components/Settings"
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard")
@@ -49,12 +50,7 @@ const Index = () => {
       case "analytics":
         return <Analytics />
       case "settings":
-        return (
-          <div className="space-y-6">
-            <h1 className="text-3xl font-bold">Settings</h1>
-            <p className="text-muted-foreground">Settings panel coming soon...</p>
-          </div>
-        )
+        return <SettingsPage />
       default:
         return <Dashboard />
     }
