@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useMembers } from "@/hooks/use-members"
+import { useMembers } from "@/hooks/use-members-new"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { StatCard } from "@/components/StatCard"
@@ -28,6 +28,7 @@ import {
   Line
 } from 'recharts'
 import { useToast } from "@/hooks/use-toast"
+import { DownloadSummaryButton } from "@/components/DownloadSummaryButton"
 
 const COLORS = ['#8B5CF6', '#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#EC4899']
 
@@ -105,8 +106,8 @@ export function Analytics() {
     const cities: { [key: string]: number } = {}
     
     members.forEach(member => {
-      // Extract city from address (assuming format includes city)
-      const addressParts = member.address.split(',')
+      const address = member.local_address || ''
+      const addressParts = address.split(',')
       const city = addressParts[1]?.trim() || 'Unknown'
       cities[city] = (cities[city] || 0) + 1
     })
@@ -122,7 +123,7 @@ export function Analytics() {
     const monthlyData: { [key: string]: number } = {}
     
     members.forEach(member => {
-      const date = new Date(member.joinDate)
+      const date = new Date(member.church_joining_date)
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
       monthlyData[monthKey] = (monthlyData[monthKey] || 0) + 1
     })
@@ -174,14 +175,17 @@ export function Analytics() {
             Comprehensive insights into your member data
           </p>
         </div>
-        <Button 
-          onClick={handleRefresh} 
-          disabled={refreshing || loading}
-          className="bg-gradient-primary hover:opacity-90 transition-smooth"
-        >
-          <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-          {refreshing ? 'Refreshing...' : 'Refresh Data'}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            onClick={handleRefresh} 
+            disabled={refreshing || loading}
+            className="bg-gradient-primary hover:opacity-90 transition-smooth"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+            {refreshing ? 'Refreshing...' : 'Refresh Data'}
+          </Button>
+          <DownloadSummaryButton variant="outline" />
+        </div>
       </div>
 
       {/* Overview Stats */}
@@ -221,7 +225,7 @@ export function Analytics() {
             <TrendingUp className="h-5 w-5" />
             Age Distribution
           </h3>
-          <div className="h-80">
+          <div id="chart-age" className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={ageDistribution}>
                 <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
@@ -249,7 +253,7 @@ export function Analytics() {
               <MapPin className="h-5 w-5" />
               Geographic Distribution
             </h3>
-            <div className="h-80">
+            <div id="chart-geo" className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -286,7 +290,7 @@ export function Analytics() {
               <Calendar className="h-5 w-5" />
               Member Join Trends
             </h3>
-            <div className="h-80">
+            <div id="chart-join" className="h-80">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={joinTrends}>
                   <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
@@ -336,10 +340,10 @@ export function Analytics() {
                 return (
                   <div key={member.id} className="flex items-center space-x-3 p-3 bg-secondary/50 rounded-lg">
                     <div className="w-10 h-10 bg-gradient-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold flex-shrink-0">
-                      {member.name.split(' ').map(n => n[0]).join('')}
+                      {`${member.first_name?.[0] || ''}${member.last_name?.[0] || ''}`}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium">{member.name}</p>
+                      <p className="font-medium">{`${member.first_name} ${member.last_name}`.trim()}</p>
                       <p className="text-sm text-muted-foreground">
                         {thisYearBirthday.toLocaleDateString()} ({daysUntil === 0 ? 'Today!' : `${daysUntil} days`})
                       </p>
@@ -362,7 +366,7 @@ export function Analytics() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center p-4 bg-secondary/30 rounded-lg">
               <div className="text-2xl font-bold text-primary">
-                {members.filter(m => m.phone).length}
+                {members.filter(m => (m.phones?.length || 0) > 0).length}
               </div>
               <div className="text-sm text-muted-foreground">
                 Members with Phone
@@ -380,7 +384,7 @@ export function Analytics() {
 
             <div className="text-center p-4 bg-secondary/30 rounded-lg">
               <div className="text-2xl font-bold text-primary">
-                {new Set(members.map(m => m.address.split(',')[1]?.trim())).size}
+                {new Set(members.map(m => (m.local_address || '').split(',')[1]?.trim())).size}
               </div>
               <div className="text-sm text-muted-foreground">
                 Unique Cities
@@ -390,7 +394,7 @@ export function Analytics() {
           {/*  Recently Joined Members */}
             <div className="text-center p-4 bg-secondary/30 rounded-lg">
               <div className="text-2xl font-bold text-primary">
-                {members.filter(m => new Date(m.joinDate) >= new Date(new Date().setMonth(new Date().getMonth() - 1))).length}
+                {members.filter(m => new Date(m.church_joining_date) >= new Date(new Date().setMonth(new Date().getMonth() - 1))).length}
               </div>
               <div className="text-sm text-muted-foreground">
                 Joined Last Month
