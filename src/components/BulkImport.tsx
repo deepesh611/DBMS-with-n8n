@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Upload, Link, FileSpreadsheet, AlertCircle, CheckCircle } from 'lucide-react'
+import { Upload, Link, FileSpreadsheet, AlertCircle, CheckCircle, Download } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Progress } from '@/components/ui/progress'
 import { useToast } from '@/hooks/use-toast'
@@ -29,6 +29,72 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
   
   const { toast } = useToast()
   const { addMember } = useMembers()
+
+  const downloadSampleCSV = () => {
+    const sampleData = [
+      {
+        title: 'Mr',
+        first_name: 'John',
+        middle_name: 'David',
+        last_name: 'Smith',
+        family_name: 'Smith Family',
+        dob: '1985-06-15',
+        email: 'john.smith@email.com',
+        family_status: 'Here',
+        carsel: 'CAR001',
+        local_address: '123 Main St, City, State',
+        church_joining_date: '2020-01-15',
+        baptism_date: '2020-02-20',
+        baptism_church: 'First Baptist Church',
+        baptism_country: 'USA',
+        primary_phone: '+1234567890',
+        whatsapp_phone: '+1234567890',
+        emergency_phone: '+0987654321',
+        origin_phone: '+1122334455',
+        is_employed: 'true',
+        company_name: 'Tech Corp',
+        designation: 'Software Engineer',
+        profession: 'Engineering',
+        employment_start_date: '2022-03-01'
+      },
+      {
+        title: 'Ms',
+        first_name: 'Mary',
+        middle_name: '',
+        last_name: 'Johnson',
+        family_name: 'Johnson Family',
+        dob: '1990-12-03',
+        email: 'mary.johnson@email.com',
+        family_status: 'Origin Country',
+        carsel: '',
+        local_address: '456 Oak Ave, City, State',
+        church_joining_date: '2021-05-10',
+        baptism_date: '',
+        baptism_church: '',
+        baptism_country: '',
+        primary_phone: '+1555666777',
+        whatsapp_phone: '',
+        emergency_phone: '+1888999000',
+        origin_phone: '',
+        is_employed: 'false',
+        company_name: '',
+        designation: '',
+        profession: '',
+        employment_start_date: ''
+      }
+    ]
+
+    const csv = Papa.unparse(sampleData)
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', 'member_import_sample.csv')
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   const validateMemberData = (data: any[]): { valid: MemberFormData[]; invalid: string[] } => {
     const valid: MemberFormData[] = []
@@ -304,10 +370,22 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <h1 className="text-3xl font-bold">Bulk Import Members</h1>
-        <p className="text-muted-foreground">
-          Required columns: first_name, last_name, dob. Optional: title, email, church_joining_date, phones, baptism and employment fields.
-        </p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">Bulk Import Members</h1>
+            <p className="text-muted-foreground">
+              Required columns: first_name, last_name, dob. Optional: title, email, church_joining_date, phones, baptism and employment fields.
+            </p>
+          </div>
+          <Button 
+            onClick={downloadSampleCSV}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Download className="h-4 w-4" />
+            Download Sample CSV
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="file" className="space-y-4">
