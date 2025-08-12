@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Member, MemberStats } from '@/types/member'
+import { Member, MemberStats } from 'src/types/member'
 
 // Mock data for development
 const mockMembers: Member[] = [
