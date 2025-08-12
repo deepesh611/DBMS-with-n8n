@@ -157,29 +157,76 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
       errors: [] as string[]
     }
 
-    for (let i = 0; i < data.length; i++) {
-      try {
-        await addMember(data[i])
-        results.success++
-      } catch (error) {
-        results.failed++
-        const name = `${data[i].first_name} ${data[i].last_name}`.trim()
-        results.errors.push(`Failed to add ${name || 'member'}: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    try {
+      // Send all members in one batch to the webhook
+      const { addMember: _, ...membersHook } = useMembers()
+      const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL
+      
+      if (webhookUrl) {
+        setProgress(25)
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            action: 'BULK_CREATE_MEMBERS', 
+            data: { members: data },
+            timestamp: new Date().toISOString() 
+          })
+        })
+        
+        setProgress(50)
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        
+        const result = await response.json()
+        setProgress(75)
+        
+        if (result?.success) {
+          results.success = data.length
+          toast({
+            title: "Bulk Import Complete",
+            description: `Successfully imported ${data.length} members in batch`,
+          })
+        } else {
+          throw new Error(result?.error || 'Bulk import failed')
+        }
+      } else {
+        // Fallback: Add members one by one locally if no webhook
+        for (let i = 0; i < data.length; i++) {
+          try {
+            await addMember(data[i])
+            results.success++
+          } catch (error) {
+            results.failed++
+            const name = `${data[i].first_name} ${data[i].last_name}`.trim()
+            results.errors.push(`Failed to add ${name || 'member'}: ${error instanceof Error ? error.message : 'Unknown error'}`)
+          }
+          setProgress(((i + 1) / data.length) * 100)
+        }
+        
+        toast({
+          title: "Import Complete (Local)",
+          description: `Successfully imported ${results.success} members${results.failed > 0 ? `, ${results.failed} failed` : ''}`,
+        })
       }
-
-      setProgress(((i + 1) / data.length) * 100)
+    } catch (error) {
+      console.error('Bulk import error:', error)
+      results.failed = data.length
+      results.errors.push(`Bulk import failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      
+      toast({
+        title: "Import Failed",
+        description: "Failed to import members. Please try again.",
+        variant: "destructive",
+      })
     }
 
+    setProgress(100)
     setImportResults(results)
     setIsLoading(false)
-
-    if (results.success > 0) {
-      toast({
-        title: "Import Complete",
-        description: `Successfully imported ${results.success} members${results.failed > 0 ? `, ${results.failed} failed` : ''}`,
-      })
-      onImportComplete?.()
-    }
+    onImportComplete?.()
   }
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {

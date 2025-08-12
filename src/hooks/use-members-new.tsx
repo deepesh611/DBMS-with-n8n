@@ -309,10 +309,13 @@ export function useMembers() {
       if (result?.success && Array.isArray(result.members)) {
         setMembers(result.members as Member[])
         toast.success('Members loaded from database')
+      } else {
+        console.warn('No members returned from webhook, keeping existing data')
       }
     } catch (error) {
       console.error('Error fetching members:', error)
-      toast.error('Failed to load members from database, using local data')
+      console.warn('N8N webhook URL not configured, using mock data')
+      // Keep mock data if webhook fails
     } finally {
       setLoading(false)
     }
