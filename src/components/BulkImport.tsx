@@ -159,7 +159,6 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
 
     try {
       // Send all members in one batch to the webhook
-      const { addMember: _, ...membersHook } = useMembers()
       const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL
       
       if (webhookUrl) {
