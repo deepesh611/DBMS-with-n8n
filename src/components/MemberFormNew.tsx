@@ -131,7 +131,7 @@ export function MemberFormNew({ member, onSave, onCancel }: MemberFormNewProps) 
   }
 
   const addChild = () => {
-    const next = [...(formData.children || []), { title: 'Mr' as Title, first_name: '', last_name: '', dob: '' }]
+    const next = [...(formData.children || []), { title: 'Mr' as Title, first_name: '', last_name: '', dob: '', email: '' }]
     handleChange('children', next)
   }
 
@@ -145,7 +145,16 @@ export function MemberFormNew({ member, onSave, onCancel }: MemberFormNewProps) 
     handleChange('children', next)
   }
 
-  const nextStep = () => setStep(s => Math.min(5, s + 1))
+  const nextStep = () => {
+    // Validate required fields on step 1
+    if (step === 1) {
+      if (!formData.first_name.trim() || !formData.last_name.trim() || !formData.email?.trim()) {
+        toast.error('First name, last name, and email are required')
+        return
+      }
+    }
+    setStep(s => Math.min(5, s + 1))
+  }
   const prevStep = () => setStep(s => Math.max(1, s - 1))
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -208,7 +217,7 @@ export function MemberFormNew({ member, onSave, onCancel }: MemberFormNewProps) 
                 </Select>
               </div>
               <div>
-                <Label>First Name</Label>
+                <Label>First Name *</Label>
                 <Input value={formData.first_name} onChange={e => handleChange('first_name', e.target.value)} required />
               </div>
               <div>
@@ -216,7 +225,7 @@ export function MemberFormNew({ member, onSave, onCancel }: MemberFormNewProps) 
                 <Input value={formData.middle_name || ''} onChange={e => handleChange('middle_name', e.target.value)} />
               </div>
               <div>
-                <Label>Last Name</Label>
+                <Label>Last Name *</Label>
                 <Input value={formData.last_name} onChange={e => handleChange('last_name', e.target.value)} required />
               </div>
               <div>
@@ -228,8 +237,8 @@ export function MemberFormNew({ member, onSave, onCancel }: MemberFormNewProps) 
                 <Input type="date" value={formData.dob} onChange={e => handleChange('dob', e.target.value)} required />
               </div>
               <div>
-                <Label>Email</Label>
-                <Input type="email" value={formData.email || ''} onChange={e => handleChange('email', e.target.value)} />
+                <Label>Email *</Label>
+                <Input type="email" value={formData.email || ''} onChange={e => handleChange('email', e.target.value)} required />
               </div>
               <div>
                 <Label>Family Status</Label>
@@ -373,8 +382,8 @@ export function MemberFormNew({ member, onSave, onCancel }: MemberFormNewProps) 
                     <Input type="date" value={formData.spouse?.dob || ''} onChange={e => handleChange('spouse', { ...(formData.spouse || { title: 'Ms' }), dob: e.target.value })} />
                   </div>
                   <div>
-                    <Label>Email</Label>
-                    <Input type="email" value={formData.spouse?.email || ''} onChange={e => handleChange('spouse', { ...(formData.spouse || { title: 'Ms' }), email: e.target.value })} />
+                    <Label>Email *</Label>
+                    <Input type="email" value={formData.spouse?.email || ''} onChange={e => handleChange('spouse', { ...(formData.spouse || { title: 'Ms' }), email: e.target.value })} required />
                   </div>
                 </div>
               )}
@@ -382,7 +391,7 @@ export function MemberFormNew({ member, onSave, onCancel }: MemberFormNewProps) 
               <div className="space-y-4">
                 <div className="font-medium">Children</div>
                 {(formData.children || []).map((child, idx) => (
-                  <div key={idx} className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                  <div key={idx} className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
                     <div>
                       <Label>Title</Label>
                       <Select value={child.title} onValueChange={(v: Title) => updateChild(idx, 'title', v)}>
@@ -395,12 +404,16 @@ export function MemberFormNew({ member, onSave, onCancel }: MemberFormNewProps) 
                       </Select>
                     </div>
                     <div>
-                      <Label>First Name</Label>
-                      <Input value={child.first_name} onChange={e => updateChild(idx, 'first_name', e.target.value)} />
+                      <Label>First Name *</Label>
+                      <Input value={child.first_name} onChange={e => updateChild(idx, 'first_name', e.target.value)} required />
                     </div>
                     <div>
-                      <Label>Last Name</Label>
-                      <Input value={child.last_name} onChange={e => updateChild(idx, 'last_name', e.target.value)} />
+                      <Label>Last Name *</Label>
+                      <Input value={child.last_name} onChange={e => updateChild(idx, 'last_name', e.target.value)} required />
+                    </div>
+                    <div>
+                      <Label>Email *</Label>
+                      <Input type="email" value={child.email || ''} onChange={e => updateChild(idx, 'email', e.target.value)} required />
                     </div>
                     <div>
                       <Label>DOB</Label>

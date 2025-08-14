@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Search, Edit, Trash2, Mail, Phone, RefreshCw } from "lucide-react"
+import { Search, Edit, Trash2, Mail, Phone, RefreshCw, Eye } from "lucide-react"
 import { useMembers } from "@/hooks/use-members-new"
 import { Member } from "@/types/member-new"
 import { Card } from "@/components/ui/card"
@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
+import { MemberDetailModal } from "@/components/MemberDetailModal"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,6 +29,8 @@ export function MembersList({ onEditMember }: MembersListProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [memberToDelete, setMemberToDelete] = useState<string | number | null>(null)
+  const [detailModalOpen, setDetailModalOpen] = useState(false)
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null)
 
   // Fetch members from database once on component mount
   useEffect(() => {
@@ -173,6 +176,17 @@ export function MembersList({ onEditMember }: MembersListProps) {
                     <Button
                       variant="ghost"
                       size="icon"
+                      onClick={() => {
+                        setSelectedMember(member)
+                        setDetailModalOpen(true)
+                      }}
+                      className="hover:bg-blue-100 hover:text-blue-600"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={() => onEditMember(member)}
                       className="hover:bg-primary/10 hover:text-primary"
                     >
@@ -223,6 +237,12 @@ export function MembersList({ onEditMember }: MembersListProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <MemberDetailModal
+        member={selectedMember}
+        open={detailModalOpen}
+        onOpenChange={setDetailModalOpen}
+      />
     </div>
   )
 }

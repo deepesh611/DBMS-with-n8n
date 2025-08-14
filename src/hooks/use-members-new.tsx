@@ -75,20 +75,30 @@ export function useMembers() {
   // Send data to n8n webhook
   const sendToN8N = async (action: string, data: any) => {
     const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL
+    console.log('Webhook URL:', webhookUrl)
+    console.log('Sending action:', action, 'with data:', data)
+    
     if (!webhookUrl) {
       console.warn('N8N webhook URL not configured')
       return null
     }
 
     try {
+      const payload = { action, data, timestamp: new Date().toISOString() }
+      console.log('Full payload:', payload)
+      
       const response = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, data, timestamp: new Date().toISOString() })
+        body: JSON.stringify(payload)
       })
 
+      console.log('Response status:', response.status)
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
-      return await response.json()
+      
+      const result = await response.json()
+      console.log('Response data:', result)
+      return result
     } catch (error) {
       console.error('Error sending to n8n:', error)
       throw error
@@ -270,15 +280,92 @@ export function useMembers() {
   }, [])
 
   // Update member
-  const updateMember = useCallback(async (id: string | number, partial: Partial<MemberFormData>) => {
+  const updateMember = useCallback(async (id: string | number, formData: MemberFormData) => {
     setLoading(true)
     try {
-      await sendToN8N('UPDATE_MEMBER', { id, ...partial })
-      setMembers(prev => prev.map(m => m.id === id ? { ...m, ...partial } as Member : m))
+      const payload = convertFormDataToPayload(formData)
+      await sendToN8N('UPDATE_MEMBER', { id, ...payload })
+      
+      // Update local state with the same structure as addMember
+      const updatedMember: Member = {
+        id: typeof id === 'string' ? parseInt(id) : id,
+        title: formData.title,
+        first_name: formData.first_name,
+        middle_name: formData.middle_name,
+        last_name: formData.last_name,
+        family_name: formData.family_name,
+        dob: formData.dob,
+        email: formData.email,
+        baptism_date: formData.baptism_date,
+        baptism_church: formData.baptism_church,
+        baptism_country: formData.baptism_country,
+        family_status: formData.family_status,
+        carsel: formData.carsel,
+        local_address: formData.local_address,
+        church_joining_date: formData.church_joining_date,
+        profile_pic: formData.profile_pic,
+        family_photo: formData.family_photo,
+        phones: [
+          ...(formData.primary_phone ? [{ phone_type: 'Primary', phone_number: formData.primary_phone } as MemberPhone] : []),
+          ...(formData.whatsapp_phone ? [{ phone_type: 'WhatsApp', phone_number: formData.whatsapp_phone } as MemberPhone] : []),
+          ...(formData.emergency_phone ? [{ phone_type: 'Emergency', phone_number: formData.emergency_phone } as MemberPhone] : []),
+          ...(formData.origin_phone ? [{ phone_type: 'Origin Country', phone_number: formData.origin_phone } as MemberPhone] : []),
+        ],
+        employment: formData.is_employed
+          ? {
+              is_employed: true,
+              company_name: formData.company_name,
+              designation: formData.designation,
+              profession: formData.profession,
+              employment_start_date: formData.employment_start_date,
+              is_current: true
+            }
+          : null,
+        relationships: []
+      }
+      
+      setMembers(prev => prev.map(m => m.id === id ? updatedMember : m))
       toast.success('Member updated successfully')
     } catch (error) {
       console.error('Error updating member:', error)
-      setMembers(prev => prev.map(m => m.id === id ? { ...m, ...partial } as Member : m))
+      // Fallback to local state update
+      const fallbackMember: Member = {
+        id: typeof id === 'string' ? parseInt(id) : id,
+        title: formData.title,
+        first_name: formData.first_name,
+        middle_name: formData.middle_name,
+        last_name: formData.last_name,
+        family_name: formData.family_name,
+        dob: formData.dob,
+        email: formData.email,
+        baptism_date: formData.baptism_date,
+        baptism_church: formData.baptism_church,
+        baptism_country: formData.baptism_country,
+        family_status: formData.family_status,
+        carsel: formData.carsel,
+        local_address: formData.local_address,
+        church_joining_date: formData.church_joining_date,
+        profile_pic: formData.profile_pic,
+        family_photo: formData.family_photo,
+        phones: [
+          ...(formData.primary_phone ? [{ phone_type: 'Primary', phone_number: formData.primary_phone } as MemberPhone] : []),
+          ...(formData.whatsapp_phone ? [{ phone_type: 'WhatsApp', phone_number: formData.whatsapp_phone } as MemberPhone] : []),
+          ...(formData.emergency_phone ? [{ phone_type: 'Emergency', phone_number: formData.emergency_phone } as MemberPhone] : []),
+          ...(formData.origin_phone ? [{ phone_type: 'Origin Country', phone_number: formData.origin_phone } as MemberPhone] : []),
+        ],
+        employment: formData.is_employed
+          ? {
+              is_employed: true,
+              company_name: formData.company_name,
+              designation: formData.designation,
+              profession: formData.profession,
+              employment_start_date: formData.employment_start_date,
+              is_current: true
+            }
+          : null,
+        relationships: []
+      }
+      setMembers(prev => prev.map(m => m.id === id ? fallbackMember : m))
       toast.success('Member updated locally (fallback)')
     } finally {
       setLoading(false)
@@ -321,6 +408,69 @@ export function useMembers() {
     }
   }, [])
 
+  // Fetch detailed member data
+  const fetchMemberDetails = useCallback(async (memberId: string | number) => {
+    try {
+      console.log('Sending FETCH_MEMBER_DETAILS request for member ID:', memberId)
+      const result = await sendToN8N('FETCH_MEMBER_DETAILS', { data: { member_id: memberId } })
+      console.log('FETCH_MEMBER_DETAILS response:', result)
+      
+      if (result?.success && result.member) {
+        return result.member
+      }
+      throw new Error('Failed to fetch member details - no member in response')
+    } catch (error) {
+      console.error('Error fetching member details:', error)
+      throw error
+    }
+  }, [])
+
+  // Transform detailed member data to standard Member format
+  const transformDetailedMember = (detailedMember: any): Member => {
+    const phones: MemberPhone[] = []
+    if (detailedMember.phone_numbers) {
+      Object.entries(detailedMember.phone_numbers).forEach(([type, number]) => {
+        phones.push({ phone_type: type as any, phone_number: number as string, is_active: true })
+      })
+    }
+
+    return {
+      ...detailedMember,
+      phones,
+      employment: detailedMember.employment || null,
+      relationships: detailedMember.family || []
+    }
+  }
+
+  // Fetch all members with detailed information for reports
+  const fetchAllMembersDetailed = useCallback(async () => {
+    setLoading(true)
+    try {
+      const basicMembers = await sendToN8N('FETCH_ALL_MEMBERS', {})
+      if (!basicMembers?.success || !Array.isArray(basicMembers.members)) {
+        return members // Fallback to current state
+      }
+
+      const detailedMembers = await Promise.all(
+        basicMembers.members.map(async (member: Member) => {
+          try {
+            const detailed = await fetchMemberDetails(member.id)
+            return transformDetailedMember(detailed)
+          } catch {
+            return member // Fallback to basic data if details fail
+          }
+        })
+      )
+
+      return detailedMembers
+    } catch (error) {
+      console.error('Error fetching detailed members:', error)
+      return members // Fallback to current state
+    } finally {
+      setLoading(false)
+    }
+  }, [members, fetchMemberDetails])
+
   return {
     members,
     stats,
@@ -328,6 +478,8 @@ export function useMembers() {
     addMember,
     updateMember,
     deleteMember,
-    fetchAllMembers
+    fetchAllMembers,
+    fetchMemberDetails,
+    fetchAllMembersDetailed
   }
 }

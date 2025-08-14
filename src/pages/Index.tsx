@@ -50,7 +50,7 @@ const Index = () => {
       case "analytics":
         return <Analytics />
       case "settings":
-        return <SettingsPage />
+        return <SettingsPage onNavigate={setActiveTab} />
       default:
         return <Dashboard />
     }

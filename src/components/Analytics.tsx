@@ -11,7 +11,8 @@ import {
   RefreshCw,
   TrendingUp,
   UserCheck,
-  Cake
+  Cake,
+  Briefcase
 } from "lucide-react"
 import { 
   BarChart, 
@@ -161,10 +162,52 @@ export function Analytics() {
     })
   }
 
+  // Employment statistics
+  const getEmploymentStats = () => {
+    const employed = members.filter(m => m.employment?.is_employed).length
+    const professions = {}
+    members.forEach(m => {
+      if (m.employment?.profession) {
+        professions[m.employment.profession] = (professions[m.employment.profession] || 0) + 1
+      }
+    })
+    return {
+      employed,
+      unemployed: members.length - employed,
+      topProfessions: Object.entries(professions)
+        .map(([profession, count]) => ({ profession, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5)
+    }
+  }
+
+  // Family status breakdown
+  const getFamilyStatusStats = () => {
+    const statusCounts = { 'Here': 0, 'Origin Country': 0 }
+    members.forEach(m => {
+      statusCounts[m.family_status] = (statusCounts[m.family_status] || 0) + 1
+    })
+    return Object.entries(statusCounts).map(([status, count]) => ({ status, count }))
+  }
+
+  // Phone type distribution
+  const getPhoneStats = () => {
+    const phoneTypes = { 'Primary': 0, 'WhatsApp': 0, 'Emergency': 0, 'Origin Country': 0 }
+    members.forEach(m => {
+      m.phones?.forEach(phone => {
+        phoneTypes[phone.phone_type] = (phoneTypes[phone.phone_type] || 0) + 1
+      })
+    })
+    return Object.entries(phoneTypes).map(([type, count]) => ({ type, count }))
+  }
+
   const ageDistribution = getAgeDistribution()
   const geographicDistribution = getGeographicDistribution()
   const joinTrends = getJoinTrends()
   const upcomingBirthdays = getUpcomingBirthdays()
+  const employmentStats = getEmploymentStats()
+  const familyStatusStats = getFamilyStatusStats()
+  const phoneStats = getPhoneStats()
 
   return (
     <div className="space-y-8">
@@ -265,6 +308,7 @@ export function Analytics() {
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="count"
+                    labelStyle={{ fill: 'hsl(var(--foreground))' }}
                   >
                     {geographicDistribution.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -274,7 +318,8 @@ export function Analytics() {
                     contentStyle={{ 
                       backgroundColor: 'hsl(var(--card))', 
                       border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px'
+                      borderRadius: '8px',
+                      color: 'hsl(var(--foreground))'
                     }}
                   />
                 </PieChart>
@@ -356,14 +401,65 @@ export function Analytics() {
         </Card>
       )}
 
+      {/* Employment & Family Status */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="bg-gradient-card border-0 shadow-elegant">
+          <div className="p-6">
+            <h3 className="text-lg font-semibold mb-4">Employment Statistics</h3>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span>Employed:</span>
+                <span className="font-bold text-green-600">{employmentStats.employed}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Unemployed:</span>
+                <span className="font-bold text-orange-600">{employmentStats.unemployed}</span>
+              </div>
+              <div className="mt-4">
+                <h4 className="font-medium mb-2">Top Professions:</h4>
+                {employmentStats.topProfessions.map(({ profession, count }) => (
+                  <div key={profession} className="flex justify-between items-center py-1">
+                    <span className="text-sm">{profession}</span>
+                    <span className="text-sm font-medium">{count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="bg-gradient-card border-0 shadow-elegant">
+          <div className="p-6">
+            <h3 className="text-lg font-semibold mb-4">Family Status & Contact</h3>
+            <div className="space-y-4">
+              {familyStatusStats.map(({ status, count }) => (
+                <div key={status} className="flex justify-between items-center">
+                  <span>{status}:</span>
+                  <span className="font-bold">{count}</span>
+                </div>
+              ))}
+              <div className="mt-4">
+                <h4 className="font-medium mb-2">Phone Types:</h4>
+                {phoneStats.map(({ type, count }) => (
+                  <div key={type} className="flex justify-between items-center py-1">
+                    <span className="text-sm">{type}</span>
+                    <span className="text-sm font-medium">{count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+
       {/* Contact Information Summary */}
       <Card className="bg-gradient-card border-0 shadow-elegant">
         <div className="p-6">
           <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
             <Phone className="h-5 w-5" />
-            Contact Summary
+            Contact & Membership Summary
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="text-center p-4 bg-secondary/30 rounded-lg">
               <div className="text-2xl font-bold text-primary">
                 {members.filter(m => (m.phones?.length || 0) > 0).length}
@@ -373,14 +469,14 @@ export function Analytics() {
               </div>
             </div>
 
-            {/*<div className="text-center p-4 bg-secondary/30 rounded-lg">*/}
-            {/*  <div className="text-2xl font-bold text-primary">*/}
-            {/*    {members.filter(m => m.emergencyContact).length}*/}
-            {/*  </div>*/}
-            {/*  <div className="text-sm text-muted-foreground">*/}
-            {/*    Emergency Contacts*/}
-            {/*  </div>*/}
-            {/*</div>*/}
+            <div className="text-center p-4 bg-secondary/30 rounded-lg">
+              <div className="text-2xl font-bold text-primary">
+                {members.filter(m => m.email).length}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                Members with Email
+              </div>
+            </div>
 
             <div className="text-center p-4 bg-secondary/30 rounded-lg">
               <div className="text-2xl font-bold text-primary">
@@ -391,7 +487,6 @@ export function Analytics() {
               </div>
             </div>
 
-          {/*  Recently Joined Members */}
             <div className="text-center p-4 bg-secondary/30 rounded-lg">
               <div className="text-2xl font-bold text-primary">
                 {members.filter(m => new Date(m.church_joining_date) >= new Date(new Date().setMonth(new Date().getMonth() - 1))).length}

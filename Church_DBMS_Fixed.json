@@ -1,0 +1,950 @@
+{
+  "name": "Church DBMS - Fixed",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "db/ruwi_church",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -640,
+        300
+      ],
+      "id": "webhook-trigger",
+      "name": "Church Member API",
+      "webhookId": "church-member-webhook"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.action }}",
+                    "rightValue": "CREATE_MEMBER",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Create Member"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.action }}",
+                    "rightValue": "UPDATE_MEMBER",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Update Member"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.action }}",
+                    "rightValue": "DELETE_MEMBER",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Delete Member"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.action }}",
+                    "rightValue": "FETCH_ALL_MEMBERS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Fetch All"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.action }}",
+                    "rightValue": "FETCH_MEMBER_DETAILS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Fetch Details"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.body.action }}",
+                    "rightValue": "BULK_CREATE_MEMBERS",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Bulk Import"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -400,
+        300
+      ],
+      "id": "action-router",
+      "name": "Action Router"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO members (title, first_name, middle_name, last_name, family_name, dob, email, baptism_date, baptism_church, baptism_country, family_status, carsel, local_address, church_joining_date, profile_pic, family_photo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "additionalFields": {
+          "queryParameters": "={{ [\n  $json.body.data.member.title,\n  $json.body.data.member.first_name,\n  $json.body.data.member.middle_name || null,\n  $json.body.data.member.last_name,\n  $json.body.data.member.family_name || null,\n  $json.body.data.member.dob,\n  $json.body.data.member.email || null,\n  $json.body.data.member.baptism_date || null,\n  $json.body.data.member.baptism_church || null,\n  $json.body.data.member.baptism_country || null,\n  $json.body.data.member.family_status || 'Here',\n  $json.body.data.member.carsel || null,\n  $json.body.data.member.local_address || null,\n  $json.body.data.member.church_joining_date,\n  $json.body.data.member.profile_pic || null,\n  $json.body.data.member.family_photo || null\n] }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        -100,
+        100
+      ],
+      "id": "insert-member",
+      "name": "Insert Member",
+      "credentials": {
+        "mySql": {
+          "id": "9eFaAfTbqkn5fu9k",
+          "name": "Ruwi Church DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT LAST_INSERT_ID() as member_id",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        100,
+        100
+      ],
+      "id": "get-member-id",
+      "name": "Get Member ID",
+      "credentials": {
+        "mySql": {
+          "id": "9eFaAfTbqkn5fu9k",
+          "name": "Ruwi Church DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const memberId = $input.first().json.member_id;\nconst phones = $('Action Router').first().json.body.data.phones || [];\n\nif (!phones.length) {\n  return [{ json: { member_id: memberId, skip_phones: true } }];\n}\n\nconst phoneInserts = phones.map(phone => ({\n  json: {\n    member_id: memberId,\n    phone_type: phone.phone_type,\n    phone_number: phone.phone_number,\n    is_active: true\n  }\n}));\n\nreturn phoneInserts;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        100
+      ],
+      "id": "process-phones",
+      "name": "Process Phones"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": {
+          "__rl": true,
+          "value": "member_phones",
+          "mode": "list"
+        },
+        "dataMode": "defineBelow",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "member_id",
+              "value": "={{ $json.member_id }}"
+            },
+            {
+              "column": "phone_type",
+              "value": "={{ $json.phone_type }}"
+            },
+            {
+              "column": "phone_number",
+              "value": "={{ $json.phone_number }}"
+            },
+            {
+              "column": "is_active",
+              "value": "={{ $json.is_active }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        500,
+        100
+      ],
+      "id": "insert-phones",
+      "name": "Insert Phones",
+      "credentials": {
+        "mySql": {
+          "id": "9eFaAfTbqkn5fu9k",
+          "name": "Ruwi Church DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const memberId = $('Get Member ID').first().json.member_id;\nconst employment = $('Action Router').first().json.body.data.employment;\n\nif (!employment || !employment.is_employed) {\n  return [{ json: { member_id: memberId, skip_employment: true } }];\n}\n\nreturn [{\n  json: {\n    member_id: memberId,\n    company_name: employment.company_name || null,\n    designation: employment.designation || null,\n    profession: employment.profession || null,\n    is_employed: true,\n    employment_start_date: employment.employment_start_date || null,\n    is_current: true\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        100
+      ],
+      "id": "process-employment",
+      "name": "Process Employment"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": {
+          "__rl": true,
+          "value": "member_employment",
+          "mode": "list"
+        },
+        "dataMode": "defineBelow",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "member_id",
+              "value": "={{ $json.member_id }}"
+            },
+            {
+              "column": "company_name",
+              "value": "={{ $json.company_name }}"
+            },
+            {
+              "column": "designation",
+              "value": "={{ $json.designation }}"
+            },
+            {
+              "column": "profession",
+              "value": "={{ $json.profession }}"
+            },
+            {
+              "column": "is_employed",
+              "value": "={{ $json.is_employed }}"
+            },
+            {
+              "column": "employment_start_date",
+              "value": "={{ $json.employment_start_date }}"
+            },
+            {
+              "column": "is_current",
+              "value": "={{ $json.is_current }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        900,
+        100
+      ],
+      "id": "insert-employment",
+      "name": "Insert Employment",
+      "credentials": {
+        "mySql": {
+          "id": "9eFaAfTbqkn5fu9k",
+          "name": "Ruwi Church DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const memberId = $('Get Member ID').first().json.member_id;\n\nreturn [{\n  json: {\n    success: true,\n    member_id: memberId,\n    message: \"Member created successfully\"\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        100
+      ],
+      "id": "create-success-response",
+      "name": "Create Success Response"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE members SET title = ?, first_name = ?, middle_name = ?, last_name = ?, family_name = ?, dob = ?, email = ?, baptism_date = ?, baptism_church = ?, baptism_country = ?, family_status = ?, carsel = ?, local_address = ?, church_joining_date = ?, profile_pic = ?, family_photo = ? WHERE id = ?",
+        "additionalFields": {
+          "queryParameters": "={{ [\n  $json.body.data.title,\n  $json.body.data.first_name,\n  $json.body.data.middle_name || null,\n  $json.body.data.last_name,\n  $json.body.data.family_name || null,\n  $json.body.data.dob,\n  $json.body.data.email || null,\n  $json.body.data.baptism_date || null,\n  $json.body.data.baptism_church || null,\n  $json.body.data.baptism_country || null,\n  $json.body.data.family_status || 'Here',\n  $json.body.data.carsel || null,\n  $json.body.data.local_address || null,\n  $json.body.data.church_joining_date,\n  $json.body.data.profile_pic || null,\n  $json.body.data.family_photo || null,\n  $json.body.data.id\n] }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        -100,
+        300
+      ],
+      "id": "update-member",
+      "name": "Update Member",
+      "credentials": {
+        "mySql": {
+          "id": "9eFaAfTbqkn5fu9k",
+          "name": "Ruwi Church DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: true,\n    message: \"Member updated successfully\"\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        100,
+        300
+      ],
+      "id": "update-success-response",
+      "name": "Update Success Response"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "DELETE FROM members WHERE id = ?",
+        "additionalFields": {
+          "queryParameters": "={{ [$json.body.data.member_id] }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        -100,
+        500
+      ],
+      "id": "delete-member",
+      "name": "Delete Member",
+      "credentials": {
+        "mySql": {
+          "id": "9eFaAfTbqkn5fu9k",
+          "name": "Ruwi Church DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: true,\n    message: \"Member deleted successfully\"\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        100,
+        500
+      ],
+      "id": "delete-success-response",
+      "name": "Delete Success Response"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  m.id,\n  m.title,\n  m.first_name,\n  m.middle_name,\n  m.last_name,\n  m.family_name,\n  m.dob,\n  m.email,\n  m.baptism_date,\n  m.baptism_church,\n  m.baptism_country,\n  m.family_status,\n  m.carsel,\n  m.local_address,\n  m.church_joining_date,\n  m.profile_pic,\n  m.family_photo,\n  m.created_at,\n  m.updated_at\nFROM members m \nORDER BY m.church_joining_date DESC",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        -100,
+        700
+      ],
+      "id": "fetch-all-members",
+      "name": "Fetch All Members",
+      "credentials": {
+        "mySql": {
+          "id": "9eFaAfTbqkn5fu9k",
+          "name": "Ruwi Church DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const members = $input.all().map(item => {\n  const member = item.json;\n  \n  // Initialize empty arrays for related data\n  member.phones = [];\n  member.employment = null;\n  member.relationships = [];\n  \n  return member;\n});\n\nreturn [{\n  json: {\n    success: true,\n    members: members\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        100,
+        700
+      ],
+      "id": "format-members-response",
+      "name": "Format Members Response"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  m.*,\n  GROUP_CONCAT(DISTINCT CONCAT(mp.phone_type, ':', mp.phone_number) SEPARATOR '|') as phones,\n  me.company_name, me.designation, me.profession, me.is_employed, me.employment_start_date,\n  GROUP_CONCAT(DISTINCT CONCAT(fr.relationship_type, ':', rm.first_name, ' ', rm.last_name) SEPARATOR '|') as family_members\nFROM members m\nLEFT JOIN member_phones mp ON m.id = mp.member_id AND mp.is_active = TRUE\nLEFT JOIN member_employment me ON m.id = me.member_id AND me.is_current = TRUE  \nLEFT JOIN family_relationships fr ON m.id = fr.member_id\nLEFT JOIN members rm ON fr.related_member_id = rm.id\nWHERE m.id = ?\nGROUP BY m.id",
+        "additionalFields": {
+          "queryParameters": "={{ [$json.body.data.member_id] }}"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        -100,
+        900
+      ],
+      "id": "fetch-member-details",
+      "name": "Fetch Member Details",
+      "credentials": {
+        "mySql": {
+          "id": "9eFaAfTbqkn5fu9k",
+          "name": "Ruwi Church DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const member = $input.first().json;\n\n// Parse phone numbers if they exist\nif (member.phones) {\n  const phoneEntries = member.phones.split('|');\n  member.phone_numbers = {};\n  phoneEntries.forEach(entry => {\n    const [type, number] = entry.split(':');\n    if (type && number) {\n      member.phone_numbers[type] = number;\n    }\n  });\n  delete member.phones;\n}\n\n// Parse family members if they exist\nif (member.family_members) {\n  const familyEntries = member.family_members.split('|');\n  member.family = familyEntries.map(entry => {\n    const [relationship, name] = entry.split(':');\n    return { relationship, name };\n  }).filter(f => f.relationship && f.name);\n  delete member.family_members;\n}\n\n// Format employment\nif (member.is_employed) {\n  member.employment = {\n    is_employed: member.is_employed,\n    company_name: member.company_name,\n    designation: member.designation,\n    profession: member.profession,\n    employment_start_date: member.employment_start_date,\n    is_current: true\n  };\n} else {\n  member.employment = null;\n}\n\n// Clean up employment fields from main object\ndelete member.company_name;\ndelete member.designation;\ndelete member.profession;\ndelete member.employment_start_date;\n\nreturn [{\n  json: {\n    success: true,\n    member: member\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        100,
+        900
+      ],
+      "id": "format-member-details",
+      "name": "Format Member Details"
+    },
+    {
+      "parameters": {
+        "jsCode": "const members = $json.body.data.members || [];\nconst results = [];\n\nfor (const memberData of members) {\n  results.push({\n    json: {\n      title: memberData.title || 'Mr',\n      first_name: memberData.first_name,\n      middle_name: memberData.middle_name || null,\n      last_name: memberData.last_name,\n      family_name: memberData.family_name || null,\n      dob: memberData.dob,\n      email: memberData.email || null,\n      baptism_date: memberData.baptism_date || null,\n      baptism_church: memberData.baptism_church || null,\n      baptism_country: memberData.baptism_country || null,\n      family_status: memberData.family_status || 'Here',\n      carsel: memberData.carsel || null,\n      local_address: memberData.local_address || null,\n      church_joining_date: memberData.church_joining_date,\n      profile_pic: memberData.profile_pic || null,\n      family_photo: memberData.family_photo || null,\n      // Phone data for later processing\n      primary_phone: memberData.primary_phone || null,\n      whatsapp_phone: memberData.whatsapp_phone || null,\n      emergency_phone: memberData.emergency_phone || null,\n      origin_phone: memberData.origin_phone || null,\n      // Employment data\n      is_employed: memberData.is_employed || false,\n      company_name: memberData.company_name || null,\n      designation: memberData.designation || null,\n      profession: memberData.profession || null,\n      employment_start_date: memberData.employment_start_date || null\n    }\n  });\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -100,
+        1100
+      ],
+      "id": "process-bulk-members",
+      "name": "Process Bulk Members"
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "table": {
+          "__rl": true,
+          "value": "members",
+          "mode": "list"
+        },
+        "dataMode": "defineBelow",
+        "valuesToSend": {
+          "values": [
+            {
+              "column": "title",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "column": "first_name",
+              "value": "={{ $json.first_name }}"
+            },
+            {
+              "column": "middle_name",
+              "value": "={{ $json.middle_name }}"
+            },
+            {
+              "column": "last_name",
+              "value": "={{ $json.last_name }}"
+            },
+            {
+              "column": "family_name",
+              "value": "={{ $json.family_name }}"
+            },
+            {
+              "column": "dob",
+              "value": "={{ $json.dob }}"
+            },
+            {
+              "column": "email",
+              "value": "={{ $json.email }}"
+            },
+            {
+              "column": "baptism_date",
+              "value": "={{ $json.baptism_date }}"
+            },
+            {
+              "column": "baptism_church",
+              "value": "={{ $json.baptism_church }}"
+            },
+            {
+              "column": "baptism_country",
+              "value": "={{ $json.baptism_country }}"
+            },
+            {
+              "column": "family_status",
+              "value": "={{ $json.family_status }}"
+            },
+            {
+              "column": "carsel",
+              "value": "={{ $json.carsel }}"
+            },
+            {
+              "column": "local_address",
+              "value": "={{ $json.local_address }}"
+            },
+            {
+              "column": "church_joining_date",
+              "value": "={{ $json.church_joining_date }}"
+            },
+            {
+              "column": "profile_pic",
+              "value": "={{ $json.profile_pic }}"
+            },
+            {
+              "column": "family_photo",
+              "value": "={{ $json.family_photo }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.4,
+      "position": [
+        100,
+        1100
+      ],
+      "id": "bulk-insert-members",
+      "name": "Bulk Insert Members",
+      "credentials": {
+        "mySql": {
+          "id": "9eFaAfTbqkn5fu9k",
+          "name": "Ruwi Church DB"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const totalMembers = $input.all().length;\n\nreturn [{\n  json: {\n    success: true,\n    imported_count: totalMembers,\n    message: `Successfully imported ${totalMembers} members`\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        1100
+      ],
+      "id": "bulk-success-response",
+      "name": "Bulk Success Response"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1300,
+        600
+      ],
+      "id": "final-response",
+      "name": "Final Response"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    success: false,\n    error: \"Invalid action or missing data\"\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        500,
+        600
+      ],
+      "id": "error-response",
+      "name": "Error Response"
+    }
+  ],
+  "connections": {
+    "Church Member API": {
+      "main": [
+        [
+          {
+            "node": "Action Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Action Router": {
+      "main": [
+        [
+          {
+            "node": "Insert Member",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Member",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Delete Member",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch All Members",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch Member Details",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Process Bulk Members",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Member": {
+      "main": [
+        [
+          {
+            "node": "Get Member ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Member ID": {
+      "main": [
+        [
+          {
+            "node": "Process Phones",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Phones": {
+      "main": [
+        [
+          {
+            "node": "Insert Phones",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Phones": {
+      "main": [
+        [
+          {
+            "node": "Process Employment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Employment": {
+      "main": [
+        [
+          {
+            "node": "Insert Employment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Employment": {
+      "main": [
+        [
+          {
+            "node": "Create Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Success Response": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Member": {
+      "main": [
+        [
+          {
+            "node": "Update Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Success Response": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Member": {
+      "main": [
+        [
+          {
+            "node": "Delete Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete Success Response": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch All Members": {
+      "main": [
+        [
+          {
+            "node": "Format Members Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Members Response": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Member Details": {
+      "main": [
+        [
+          {
+            "node": "Format Member Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Member Details": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Bulk Members": {
+      "main": [
+        [
+          {
+            "node": "Bulk Insert Members",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bulk Insert Members": {
+      "main": [
+        [
+          {
+            "node": "Bulk Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bulk Success Response": {
+      "main": [
+        [
+          {
+            "node": "Final Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Response": {
+      "main": [
+        [
+          {
+          "node": "Final Response",
+          "type": "main",
+          "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "fixed-workflow-v1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "ChurchDBMSFixed",
+  "tags": [
+    {
+      "id": "production-ready",
+      "name": "Production Ready ✅"
+    }
+  ]
+}

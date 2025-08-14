@@ -8,25 +8,24 @@ import { useToast } from "@/hooks/use-toast"
 import { DownloadSummaryButton } from "@/components/DownloadSummaryButton"
 import { Activity, Cloud, Database, FileDown, Link as LinkIcon, Shield, SunMoon, Wrench } from "lucide-react"
 
-export function Settings() {
+interface SettingsProps {
+  onNavigate?: (tab: string) => void
+}
+
+export function Settings({ onNavigate }: SettingsProps = {}) {
   const { toast } = useToast()
   const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL as string | undefined
-  const maskedWebhook = useMemo(() => {
-    if (!webhookUrl) return 'Not configured'
-    if (webhookUrl.length <= 16) return webhookUrl
-    return `${webhookUrl.slice(0, 16)}…${webhookUrl.slice(-6)}`
-  }, [webhookUrl])
-
+  const [currentWebhookUrl, setCurrentWebhookUrl] = useState(webhookUrl || '')
   const [testing, setTesting] = useState(false)
 
   const handleTestWebhook = async () => {
-    if (!webhookUrl) {
-      toast({ title: 'n8n not configured', description: 'Set VITE_N8N_WEBHOOK_URL in your .env.', variant: 'destructive' })
+    if (!currentWebhookUrl.trim()) {
+      toast({ title: 'n8n not configured', description: 'Enter a webhook URL to test.', variant: 'destructive' })
       return
     }
     setTesting(true)
     try {
-      const res = await fetch(webhookUrl, {
+      const res = await fetch(currentWebhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'PING', timestamp: new Date().toISOString() })
@@ -57,8 +56,12 @@ export function Settings() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label className="flex items-center gap-2"><LinkIcon className="h-4 w-4" /> n8n Webhook URL</Label>
-              <Input value={maskedWebhook} readOnly className="bg-muted/40" />
-              <p className="text-xs text-muted-foreground">This is read-only here. To change it, set VITE_N8N_WEBHOOK_URL in your .env and rebuild.</p>
+              <Input 
+                value={currentWebhookUrl} 
+                onChange={(e) => setCurrentWebhookUrl(e.target.value)}
+                placeholder="Enter your n8n webhook URL"
+              />
+              <p className="text-xs text-muted-foreground">Enter your n8n webhook URL for testing. Changes are temporary for this session.</p>
             </div>
             <div className="flex items-center gap-2">
               <Button onClick={handleTestWebhook} disabled={testing} className="flex items-center gap-2">
@@ -84,10 +87,12 @@ export function Settings() {
             <p className="text-sm text-muted-foreground">Generate a ZIP with a PDF summary plus CSVs (members, age distribution, geography, join trends, professions, etc.).</p>
             <div className="flex items-center gap-3">
               <DownloadSummaryButton />
-              <Button variant="outline" className="flex items-center gap-2" asChild>
-                <a href="#analytics">
-                  <FileDown className="h-4 w-4" /> View Analytics
-                </a>
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2"
+                onClick={() => onNavigate?.('analytics')}
+              >
+                <FileDown className="h-4 w-4" /> View Analytics
               </Button>
             </div>
           </CardContent>
