@@ -69,6 +69,45 @@ export function MemberDetailModal({ member, open, onOpenChange }: MemberDetailMo
           </div>
         ) : (
           <div className="space-y-6">
+            {/* Images */}
+            {(data.profile_pic || data.family_photo) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Photos</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex gap-4">
+                    {data.profile_pic && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">Profile Picture</p>
+                        <img 
+                          src={`${import.meta.env.VITE_N8N_IMAGE_URL}?file=${data.profile_pic.replace('/uploads/', '')}`}
+                          alt="Profile"
+                          className="max-w-32 max-h-32 object-contain rounded-lg border"
+                          onError={(e) => {
+                            e.currentTarget.src = '/placeholder.svg'
+                          }}
+                        />
+                      </div>
+                    )}
+                    {data.family_photo && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">Family Photo</p>
+                        <img 
+                          src={`${import.meta.env.VITE_N8N_IMAGE_URL}?file=${data.family_photo.replace('/uploads/', '')}`}
+                          alt="Family"
+                          className="max-w-32 max-h-32 object-contain rounded-lg border"
+                          onError={(e) => {
+                            e.currentTarget.src = '/placeholder.svg'
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Basic Info */}
             <Card>
               <CardHeader>

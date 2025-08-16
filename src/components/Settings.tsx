@@ -15,8 +15,11 @@ interface SettingsProps {
 export function Settings({ onNavigate }: SettingsProps = {}) {
   const { toast } = useToast()
   const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL as string | undefined
+  const imageUrl = import.meta.env.VITE_N8N_IMAGE_URL as string | undefined
   const [currentWebhookUrl, setCurrentWebhookUrl] = useState(webhookUrl || '')
+  const [currentImageUrl, setCurrentImageUrl] = useState(imageUrl || '')
   const [testing, setTesting] = useState(false)
+  const [testingImage, setTestingImage] = useState(false)
 
   const handleTestWebhook = async () => {
     if (!currentWebhookUrl.trim()) {
@@ -39,6 +42,28 @@ export function Settings({ onNavigate }: SettingsProps = {}) {
     }
   }
 
+  const handleTestImageServer = async () => {
+    if (!currentImageUrl.trim()) {
+      toast({ title: 'Image server not configured', description: 'Enter an image server URL to test.', variant: 'destructive' })
+      return
+    }
+    setTestingImage(true)
+    try {
+      const res = await fetch(`${currentImageUrl}?file=test.jpg`)
+      if (res.status === 404) {
+        toast({ title: 'Image server OK', description: 'Server responded (no test image found, which is expected).' })
+      } else if (res.ok) {
+        toast({ title: 'Image server OK', description: 'Server responded successfully.' })
+      } else {
+        throw new Error(`HTTP ${res.status}`)
+      }
+    } catch (e) {
+      toast({ title: 'Image server test failed', description: e instanceof Error ? e.message : 'Unknown error', variant: 'destructive' })
+    } finally {
+      setTestingImage(false)
+    }
+  }
+
   return (
     <div className="space-y-8">
       <div>
@@ -54,20 +79,39 @@ export function Settings({ onNavigate }: SettingsProps = {}) {
             <CardDescription>Manage external services connected to MemberHub</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2"><LinkIcon className="h-4 w-4" /> n8n Webhook URL</Label>
-              <Input 
-                value={currentWebhookUrl} 
-                onChange={(e) => setCurrentWebhookUrl(e.target.value)}
-                placeholder="Enter your n8n webhook URL"
-              />
-              <p className="text-xs text-muted-foreground">Enter your n8n webhook URL for testing. Changes are temporary for this session.</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button onClick={handleTestWebhook} disabled={testing} className="flex items-center gap-2">
-                <Activity className={`h-4 w-4 ${testing ? 'animate-spin' : ''}`} />
-                {testing ? 'Testing…' : 'Test n8n Connection'}
-              </Button>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2"><LinkIcon className="h-4 w-4" /> n8n Webhook URL</Label>
+                <Input 
+                  value={currentWebhookUrl} 
+                  onChange={(e) => setCurrentWebhookUrl(e.target.value)}
+                  placeholder="Enter your n8n webhook URL"
+                />
+                <div className="flex items-center gap-2">
+                  <Button onClick={handleTestWebhook} disabled={testing} size="sm" className="flex items-center gap-2">
+                    <Activity className={`h-4 w-4 ${testing ? 'animate-spin' : ''}`} />
+                    {testing ? 'Testing…' : 'Test Connection'}
+                  </Button>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2"><LinkIcon className="h-4 w-4" /> Image Server URL</Label>
+                <Input 
+                  value={currentImageUrl} 
+                  onChange={(e) => setCurrentImageUrl(e.target.value)}
+                  placeholder="Enter your image server URL"
+                />
+                <div className="flex items-center gap-2">
+                  <Button onClick={handleTestImageServer} disabled={testingImage} size="sm" className="flex items-center gap-2">
+                    <Activity className={`h-4 w-4 ${testingImage ? 'animate-spin' : ''}`} />
+                    {testingImage ? 'Testing…' : 'Test Image Server'}
+                  </Button>
+                </div>
+              </div>
+              
+              <p className="text-xs text-muted-foreground">Enter your n8n URLs for testing. Changes are temporary for this session.</p>
+              
               <Button variant="outline" className="flex items-center gap-2" asChild>
                 <a href="https://docs.n8n.io/integrations/core-nodes/n8n-nodes-base.webhook/" target="_blank" rel="noreferrer">
                   <Wrench className="h-4 w-4" /> n8n Docs
@@ -85,11 +129,11 @@ export function Settings({ onNavigate }: SettingsProps = {}) {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">Generate a ZIP with a PDF summary plus CSVs (members, age distribution, geography, join trends, professions, etc.).</p>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <DownloadSummaryButton />
               <Button 
                 variant="outline" 
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 w-full sm:w-auto"
                 onClick={() => onNavigate?.('analytics')}
               >
                 <FileDown className="h-4 w-4" /> View Analytics

@@ -10,6 +10,7 @@ import { Analytics } from "@/components/Analytics"
 import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Settings as SettingsPage } from "@/components/Settings"
+import { ScrollToTop } from "@/components/ScrollToTop"
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard")
@@ -102,6 +103,7 @@ const Index = () => {
         
         <main className="flex-1 p-4 md:p-8 overflow-auto">
           {renderContent()}
+          <ScrollToTop />
         </main>
       </div>
     </div>

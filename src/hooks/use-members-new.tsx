@@ -72,6 +72,31 @@ export function useMembers() {
     ).size
   }
 
+  // Send FormData to n8n webhook
+  const sendFormDataToN8N = async (formData: FormData) => {
+    const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL
+    
+    if (!webhookUrl) {
+      console.warn('N8N webhook URL not configured')
+      return null
+    }
+
+    try {
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+      
+      const result = await response.json()
+      return result
+    } catch (error) {
+      console.error('Error sending to n8n:', error)
+      throw error
+    }
+  }
+
   // Send data to n8n webhook
   const sendToN8N = async (action: string, data: any) => {
     const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL

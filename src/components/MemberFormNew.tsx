@@ -107,27 +107,69 @@ export function MemberFormNew({ member, onSave, onCancel }: MemberFormNewProps) 
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  const toBase64 = (file: File): Promise<string> => new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = reject
-    reader.readAsDataURL(file)
-  })
+  const validateFile = (file: File): boolean => {
+    const maxSize = 4 * 1024 * 1024 // 4MB
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    
+    if (file.size > maxSize) {
+      toast.error('Image must be less than 4MB')
+      return false
+    }
+    
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Only JPEG, JPG, PNG, and WebP images are allowed')
+      return false
+    }
+    
+    return true
+  }
+
+  const compressImage = (file: File): Promise<string> => {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')!
+    const img = new Image()
+    
+    return new Promise((resolve) => {
+      img.onload = () => {
+        const ratio = Math.min(800 / img.width, 800 / img.height)
+        canvas.width = img.width * ratio
+        canvas.height = img.height * ratio
+        
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        const base64 = canvas.toDataURL('image/jpeg', 0.8)
+        resolve(base64)
+      }
+      
+      img.src = URL.createObjectURL(file)
+    })
+  }
 
   const handleProfilePicChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file) return
-    const b64 = await toBase64(file)
-    setProfilePreview(b64)
-    handleChange('profile_pic', b64)
+    if (!file || !validateFile(file)) return
+    
+    try {
+      const compressedBase64 = await compressImage(file)
+      setProfilePreview(compressedBase64)
+      handleChange('profile_pic', compressedBase64)
+      toast.success('Profile picture processed')
+    } catch (error) {
+      toast.error('Image processing failed')
+    }
   }
 
   const handleFamilyPhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
-    if (!file) return
-    const b64 = await toBase64(file)
-    setFamilyPreview(b64)
-    handleChange('family_photo', b64)
+    if (!file || !validateFile(file)) return
+    
+    try {
+      const compressedBase64 = await compressImage(file)
+      setFamilyPreview(compressedBase64)
+      handleChange('family_photo', compressedBase64)
+      toast.success('Family photo processed')
+    } catch (error) {
+      toast.error('Image processing failed')
+    }
   }
 
   const addChild = () => {

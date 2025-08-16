@@ -13,6 +13,7 @@ A comprehensive **Member Management System** built with modern web technologies 
 ## ✨ Features
 
 - 👥 **Complete Member Management** — Add, edit, delete members with detailed profiles
+- 🖼️ **Image Management** — Upload and display profile pictures and family photos with automatic compression
 - 👨‍👩‍👧‍👦 **Family Relationships** — Track spouses, children, and family connections
 - 📊 **Rich Analytics Dashboard** — Age distribution, geographic insights, employment stats
 - 📱 **Multi-Contact Support** — Primary, WhatsApp, emergency, and origin country phones
@@ -65,8 +66,9 @@ A comprehensive **Member Management System** built with modern web technologies 
     ```bash    
     cp .env.example .env
     ```
-    Now open `.env` and set your actual `VITE_N8N_WEBHOOK_URL`.
-    This should point to your n8n webhook endpoint that handles member operations.
+    Now open `.env` and set your actual URLs:
+    - `VITE_N8N_WEBHOOK_URL` - Your n8n webhook endpoint for member operations
+    - `VITE_N8N_IMAGE_URL` - Your n8n image server endpoint for serving uploaded images
 
 
 4. **Run the app:**
@@ -121,6 +123,7 @@ Restart n8n and enjoy the peace.
 
 ### Member Management
 - **Multi-step Form**: Organized data entry across 5 logical steps
+- **Image Upload**: Profile pictures and family photos with automatic compression and validation
 - **Family Support**: Add spouse and children with automatic relationship linking
 - **Contact Flexibility**: Multiple phone types and email validation
 - **Employment Tracking**: Current job status, company, and profession details
@@ -179,9 +182,14 @@ docker-compose --profile gpu-amd up -d
 - **Adminer**: http://localhost:8080 (Database Management)
 - **Qdrant**: http://localhost:6333 (Vector Database)
 - **Ollama**: http://localhost:11434 (AI Models)
+- **Image Server**: http://localhost:5678/webhook-test/uploads (Image serving endpoint)
 
-### Sample Workflow
-A [sample n8n workflow](./assets/sample_workflow.json) is included in the repository.
+### n8n Workflows
+Two main workflows power the system:
+1. **Member Management Workflow** - Handles CRUD operations, family relationships, and image processing
+2. **Image Server Workflow** - Serves uploaded images with proper caching headers
+
+Sample workflows are included in the repository.
 
 ## 📊 Sample Data
 The app includes [mock data](./assets/member_import_sample.csv) for development and testing. In production, all data flows through your n8n workflows to MySQL.

@@ -31,7 +31,7 @@ export function DownloadSummaryButton({ variant = 'default', size = 'default', i
           { id: 'chart-join', fileName: 'join-trends' },
         ] : []
       })
-      toast({ title: 'Enhanced Report Ready', description: 'A ZIP with detailed PDF + CSVs including phone numbers, employment, and family data has been downloaded.' })
+      toast({ title: 'Enhanced Report Ready', description: 'A ZIP with detailed PDF + CSVs including phone numbers, employment, family data, and image references has been downloaded.' })
     } catch (e) {
       toast({ title: 'Failed to generate report', description: e instanceof Error ? e.message : 'Unknown error', variant: 'destructive' })
     } finally {
