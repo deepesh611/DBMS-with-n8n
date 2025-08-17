@@ -81,7 +81,10 @@ export function MemberDetailModal({ member, open, onOpenChange }: MemberDetailMo
                       <div className="space-y-2">
                         <p className="text-sm text-muted-foreground">Profile Picture</p>
                         <img 
-                          src={`${import.meta.env.VITE_N8N_IMAGE_URL}?file=${data.profile_pic.replace('/uploads/', '')}`}
+                          src={data.profile_pic.includes('drive.google.com') 
+                            ? `https://drive.google.com/thumbnail?id=${data.profile_pic.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1]}&sz=w400`
+                            : `${import.meta.env.VITE_N8N_IMAGE_URL}?file=${data.profile_pic.replace('/uploads/', '')}`
+                          }
                           alt="Profile"
                           className="max-w-32 max-h-32 object-contain rounded-lg border"
                           onError={(e) => {
@@ -94,7 +97,10 @@ export function MemberDetailModal({ member, open, onOpenChange }: MemberDetailMo
                       <div className="space-y-2">
                         <p className="text-sm text-muted-foreground">Family Photo</p>
                         <img 
-                          src={`${import.meta.env.VITE_N8N_IMAGE_URL}?file=${data.family_photo.replace('/uploads/', '')}`}
+                          src={data.family_photo.includes('drive.google.com') 
+                            ? `https://drive.google.com/thumbnail?id=${data.family_photo.match(/\/d\/([a-zA-Z0-9-_]+)/)?.[1]}&sz=w400`
+                            : `${import.meta.env.VITE_N8N_IMAGE_URL}?file=${data.family_photo.replace('/uploads/', '')}`
+                          }
                           alt="Family"
                           className="max-w-32 max-h-32 object-contain rounded-lg border"
                           onError={(e) => {

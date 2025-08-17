@@ -189,8 +189,8 @@ services:
     build: .
     container_name: church-frontend
     environment:
-      - VITE_N8N_WEBHOOK_URL=http://localhost:5678/webhook-test/db/ruwi_church
-      - VITE_N8N_IMAGE_URL=http://localhost:5678/webhook-test/uploads
+      - VITE_N8N_WEBHOOK_URL=<MAIN_WEBHOOK_URL>
+      - VITE_N8N_IMAGE_URL=<IMAGE_SERVER_WEBHOOK_URL>
     ports:
       - "3000:3000"
     volumes:

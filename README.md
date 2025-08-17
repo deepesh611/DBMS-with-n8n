@@ -21,7 +21,7 @@ A comprehensive **Member Management System** built with modern web technologies 
 - 🎂 **Birthday Reminders** — Never miss a member's special day
 - 📈 **Visual Reports** — Charts, graphs, and exportable data summaries
 - 🌙 **Dark/Light Theme** — Beautiful UI that adapts to user preference
-- 📤 **Bulk Import/Export** — CSV support for easy data migration
+- 📤 **Bulk Import/Export** — CSV support with Google Drive image integration for easy data migration
 - ⚡ **Real-time Updates** — Powered by n8n webhooks for instant data sync
 
 ---
@@ -123,7 +123,7 @@ Restart n8n and enjoy the peace.
 
 ### Member Management
 - **Multi-step Form**: Organized data entry across 5 logical steps
-- **Image Upload**: Profile pictures and family photos with automatic compression and validation
+- **Dual Image Support**: Local uploads (compressed) or Google Drive links from bulk imports
 - **Family Support**: Add spouse and children with automatic relationship linking
 - **Contact Flexibility**: Multiple phone types and email validation
 - **Employment Tracking**: Current job status, company, and profession details
@@ -136,7 +136,8 @@ Restart n8n and enjoy the peace.
 - **Birthday Tracking**: Upcoming celebrations in the next 30 days
 
 ### Data Management
-- **Bulk Import**: CSV upload for migrating existing member data
+- **Bulk Import**: CSV/XLSX upload or Google Sheets URL with Google Drive image support
+- **Google Forms Integration**: Direct import from Google Forms responses with image attachments
 - **Export Options**: Generate comprehensive reports and summaries
 - **Search & Filter**: Quickly find members by various criteria
 - **Backup Ready**: All data stored in standard MySQL format
@@ -185,14 +186,34 @@ docker-compose --profile gpu-amd up -d
 - **Image Server**: http://localhost:5678/webhook-test/uploads (Image serving endpoint)
 
 ### n8n Workflows
-Two main workflows power the system:
-1. **Member Management Workflow** - Handles CRUD operations, family relationships, and image processing
-2. **Image Server Workflow** - Serves uploaded images with proper caching headers
+Three main workflows power the system:
+1. **Member Management Workflow** - Handles CRUD operations, family relationships, and local image processing
+2. **Bulk Import Workflow** - Processes CSV/XLSX files with Google Drive image integration
+3. **Image Server Workflow** - Serves locally uploaded images with proper caching headers
 
 Sample workflows are included in the repository.
 
 ## 📊 Sample Data
 The app includes [mock data](./assets/member_import_sample.csv) for development and testing. In production, all data flows through your n8n workflows to MySQL.
+
+## 🖼️ Google Drive Integration
+
+### For Google Forms Integration
+When using Google Forms for member registration:
+1. **File Upload Questions**: Google Forms automatically saves uploaded images to Google Drive
+2. **CSV Export**: Contains Google Drive URLs for uploaded images
+3. **Bulk Import**: System automatically handles both local uploads and Google Drive links
+4. **Image Display**: Uses Google Drive thumbnail API for fast, reliable image viewing
+
+### Supported Image Sources
+- **Individual Registration**: Local upload with compression and n8n file serving
+- **Bulk Import**: Google Drive URLs stored directly in database
+- **Mixed Environment**: System automatically detects and handles both types seamlessly
+
+### Google Drive Setup
+- Images must be set to "Anyone with the link can view"
+- No Google API keys required - uses public thumbnail endpoints
+- Automatic file ID extraction from various Google Drive URL formats
 
 ## 🔧 Self-Hosted Customization
 Complete control means unlimited customization:

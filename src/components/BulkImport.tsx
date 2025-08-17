@@ -134,7 +134,9 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
         company_name: row.company_name || '',
         designation: row.designation || '',
         profession: row.profession || '',
-        employment_start_date: row.employment_start_date || ''
+        employment_start_date: row.employment_start_date || '',
+        profile_pic: row.profile_pic || '',
+        family_photo: row.family_photo || ''
       }
 
       if (!form.first_name || !form.last_name || !form.dob) {
@@ -472,7 +474,7 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  Make sure your file has columns: <strong>first_name, last_name, dob</strong> (required). Optional: title, email, family_status, church_joining_date, local_address, carsel, primary_phone, whatsapp_phone, emergency_phone, origin_phone, baptism_*, employment_*.
+                  Make sure your file has columns: <strong>first_name, last_name, dob</strong> (required). Optional: title, email, family_status, church_joining_date, local_address, carsel, primary_phone, whatsapp_phone, emergency_phone, origin_phone, baptism_*, employment_*, profile_pic, family_photo (Google Drive URLs).
                 </AlertDescription>
               </Alert>
             </CardContent>
@@ -507,7 +509,7 @@ export function BulkImport({ onImportComplete }: BulkImportProps) {
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  Make sure your file has columns: <strong>first_name, last_name, dob</strong> (required). Optional similar to the file upload.
+                  Make sure your file has columns: <strong>first_name, last_name, dob</strong> (required). Optional: title, email, family_status, church_joining_date, local_address, carsel, primary_phone, whatsapp_phone, emergency_phone, origin_phone, baptism_*, employment_*, profile_pic, family_photo (Google Drive URLs).
                 </AlertDescription>
               </Alert>
               

@@ -108,11 +108,11 @@ export function MemberFormNew({ member, onSave, onCancel }: MemberFormNewProps) 
   }
 
   const validateFile = (file: File): boolean => {
-    const maxSize = 4 * 1024 * 1024 // 4MB
+    const maxSize = 6 * 1024 * 1024 // 6MB
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
     
     if (file.size > maxSize) {
-      toast.error('Image must be less than 4MB')
+      toast.error('Image must be less than 6MB')
       return false
     }
     
