@@ -222,6 +222,3 @@ Complete control means unlimited customization:
 - **Integrate with your existing systems** (email servers, SMS gateways)
 - **Backup and migrate** your data however you want
 - **Scale on your hardware** without subscription limits
-
-## 📝 License
-MIT License - feel free to use this for your organization!
