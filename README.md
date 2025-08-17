@@ -2,6 +2,11 @@
 
 > **[PREVIEW LIVE DEMO](https://dbms-with-n8n.vercel.app/)**
 
+![](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)
+![](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![](https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white)
+
 A comprehensive **Member Management System** built with modern web technologies and powered by n8n workflows. Manage member information, track family relationships, monitor employment status, and generate detailed analytics — all without writing backend code!
 
 > **Example Implementation**: This repository demonstrates a church member management system, but the architecture can be adapted for any organization needing member/user management.
