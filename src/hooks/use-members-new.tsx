@@ -130,7 +130,7 @@ export function useMembers() {
     }
   }
 
-  // Convert form data to backend payload (matches DATABASE_SCHEMA_NEW.md guidance)
+  // Convert form data to backend payload (matches DATABASE_SCHEMA.md guidance)
   const convertFormDataToPayload = (form: MemberFormData) => {
     const member = {
       title: form.title,
