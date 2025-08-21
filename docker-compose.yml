@@ -23,6 +23,7 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD:-church_password}
     volumes:
       - mysql_storage:/var/lib/mysql
+      - ./assets/church_management.sql:/docker-entrypoint-initdb.d/church_management.sql
     ports:
       - "3306:3306"
     healthcheck:
@@ -49,9 +50,9 @@ services:
     environment:
       - DB_TYPE=mysqldb
       - DB_MYSQLDB_HOST=mysql
-      - DB_MYSQLDB_USER=${MYSQL_USER:-church_user}
-      - DB_MYSQLDB_PASSWORD=${MYSQL_PASSWORD:-church_password}
-      - DB_MYSQLDB_DATABASE=${MYSQL_DATABASE:-church_members}
+      - DB_MYSQLDB_USER=root
+      - DB_MYSQLDB_PASSWORD=${MYSQL_ROOT_PASSWORD:-rootpassword}
+      - DB_MYSQLDB_DATABASE=n8n_db
       - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-your-encryption-key-here}
       - N8N_USER_MANAGEMENT_JWT_SECRET=${N8N_USER_MANAGEMENT_JWT_SECRET:-your-jwt-secret-here}
       - N8N_CORS_ENABLED=true
