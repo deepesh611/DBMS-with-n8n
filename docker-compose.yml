@@ -1,203 +1,81 @@
-# Based on n8n AI Starter Kit: https://github.com/n8n-io/self-hosted-ai-starter-kit
-# Please verify the latest configuration before using
+# Standard n8n setup for DBMS with n8n
 
 version: '3.8'
 
 volumes:
   n8n_storage:
   mysql_storage:
-  ollama_storage:
-  qdrant_storage:
   uploads_storage:
 
 networks:
-  demo:
-
-x-n8n: &service-n8n
-  image: n8nio/n8n:latest
-  networks: ['demo']
-  environment:
-    - DB_TYPE=mysqldb
-    - DB_MYSQLDB_HOST=mysql
-    - DB_MYSQLDB_USER=${MYSQL_USER}
-    - DB_MYSQLDB_PASSWORD=${MYSQL_PASSWORD}
-    - DB_MYSQLDB_DATABASE=${MYSQL_DATABASE}
-    - N8N_DIAGNOSTICS_ENABLED=false
-    - N8N_PERSONALIZATION_ENABLED=false
-    - N8N_ENCRYPTION_KEY
-    - N8N_USER_MANAGEMENT_JWT_SECRET
-    - N8N_CORS_ENABLED=true
-    - OLLAMA_HOST=${OLLAMA_HOST:-ollama:11434}
-  env_file:
-    - path: .env
-      required: true
-
-x-ollama: &service-ollama
-  image: ollama/ollama:latest
-  container_name: ollama
-  networks: ['demo']
-  restart: unless-stopped
-  ports:
-    - 11434:11434
-  volumes:
-    - ollama_storage:/root/.ollama
-
-x-init-ollama: &init-ollama
-  image: ollama/ollama:latest
-  networks: ['demo']
-  container_name: ollama-pull-llama
-  volumes:
-    - ollama_storage:/root/.ollama
-  entrypoint: /bin/sh
-  environment:
-    - OLLAMA_HOST=ollama:11434
-  command:
-    - "-c"
-    - "sleep 3; ollama pull llama3.2"
+  dbms:
 
 services:
   mysql:
     image: mysql:8.0
-    hostname: mysql
-    networks: ['demo']
+    container_name: mysql
+    networks: ['dbms']
     restart: unless-stopped
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-rootpassword}
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-church_members}
+      - MYSQL_USER=${MYSQL_USER:-church_user}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-church_password}
     volumes:
       - mysql_storage:/var/lib/mysql
     ports:
       - "3306:3306"
     healthcheck:
       test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 5
 
   adminer:
     image: adminer
-    hostname: adminer
-    networks: ['demo']
+    container_name: adminer
+    networks: ['dbms']
     restart: unless-stopped
     ports:
       - "8080:8080"
     depends_on:
       - mysql
 
-  n8n-import:
-    <<: *service-n8n
-    hostname: n8n-import
-    container_name: n8n-import
-    entrypoint: /bin/sh
-    command:
-      - "-c"
-      - "n8n import:credentials --separate --input=/demo-data/credentials && n8n import:workflow --separate --input=/demo-data/workflows"
-    volumes:
-      - ./n8n:/demo-data
-    depends_on:
-      mysql:
-        condition: service_healthy
-
   n8n:
-    <<: *service-n8n
-    hostname: n8n
+    image: n8nio/n8n:latest
     container_name: n8n
+    networks: ['dbms']
     restart: unless-stopped
+    environment:
+      - DB_TYPE=mysqldb
+      - DB_MYSQLDB_HOST=mysql
+      - DB_MYSQLDB_USER=${MYSQL_USER:-church_user}
+      - DB_MYSQLDB_PASSWORD=${MYSQL_PASSWORD:-church_password}
+      - DB_MYSQLDB_DATABASE=${MYSQL_DATABASE:-church_members}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY:-your-encryption-key-here}
+      - N8N_USER_MANAGEMENT_JWT_SECRET=${N8N_USER_MANAGEMENT_JWT_SECRET:-your-jwt-secret-here}
+      - N8N_CORS_ENABLED=true
+      - N8N_DIAGNOSTICS_ENABLED=false
+      - N8N_PERSONALIZATION_ENABLED=false
     ports:
-      - 5678:5678
+      - "5678:5678"
     volumes:
       - n8n_storage:/home/node/.n8n
-      - ./n8n:/demo-data
-      - ./shared:/data/shared
       - uploads_storage:/data/uploads
     depends_on:
       mysql:
         condition: service_healthy
-      n8n-import:
-        condition: service_completed_successfully
-
-  qdrant:
-    image: qdrant/qdrant
-    hostname: qdrant
-    container_name: qdrant
-    networks: ['demo']
-    restart: unless-stopped
-    ports:
-      - 6333:6333
-    volumes:
-      - qdrant_storage:/qdrant/storage
-
-  ollama-cpu:
-    profiles: ["cpu"]
-    <<: *service-ollama
-
-  ollama-gpu:
-    profiles: ["gpu-nvidia"]
-    <<: *service-ollama
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-
-  ollama-gpu-amd:
-    profiles: ["gpu-amd"]
-    <<: *service-ollama
-    image: ollama/ollama:rocm
-    devices:
-      - "/dev/kfd"
-      - "/dev/dri"
-
-  ollama-pull-llama-cpu:
-    profiles: ["cpu"]
-    <<: *init-ollama
-    depends_on:
-      - ollama-cpu
-
-  ollama-pull-llama-gpu:
-    profiles: ["gpu-nvidia"]
-    <<: *init-ollama
-    depends_on:
-      - ollama-gpu
-
-  ollama-pull-llama-gpu-amd:
-    profiles: [gpu-amd]
-    <<: *init-ollama
-    image: ollama/ollama:rocm
-    depends_on:
-     - ollama-gpu-amd
-
-  # File Server for uploads
-  file-server:
-    image: nginx:alpine
-    container_name: file-server
-    ports:
-      - "8090:80"
-    volumes:
-      - uploads_storage:/usr/share/nginx/html/uploads
-      - ./nginx-uploads.conf:/etc/nginx/conf.d/default.conf
-    networks:
-      - demo
-    restart: unless-stopped
 
   # React Frontend
   frontend:
     build: .
-    container_name: church-frontend
+    container_name: dbms-frontend
+    networks: ['dbms']
     environment:
-      - VITE_N8N_WEBHOOK_URL=<MAIN_WEBHOOK_URL>
-      - VITE_N8N_IMAGE_URL=<IMAGE_SERVER_WEBHOOK_URL>
+      - VITE_N8N_WEBHOOK_URL=http://localhost:5678/webhook-test/db/ruwi_church
+      - VITE_N8N_IMAGE_URL=http://localhost:5678/webhook-test/uploads
     ports:
       - "3000:3000"
-    volumes:
-      - uploads_storage:/app/uploads
     depends_on:
       - n8n
-      - file-server
     restart: unless-stopped
-    networks:
-      - demo

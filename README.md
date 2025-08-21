@@ -150,10 +150,7 @@ Restart n8n and enjoy the peace.
 ## 🚀 Self-Hosting Setup
 
 ### Docker Compose (Recommended)
-This project uses the **n8n AI Starter Kit** configuration for enhanced capabilities.
-
-**⚠️ Important**: Please verify the latest configuration at the official repository before using:
-**https://github.com/n8n-io/self-hosted-ai-starter-kit**
+This project uses a standard n8n setup optimized for member management.
 
 ```bash
 # 1. Clone and setup
@@ -165,29 +162,19 @@ cp .env.example .env
 # Edit .env with your settings
 
 # 3. Start the complete stack
-docker-compose --profile cpu up -d
-
-# For GPU support (NVIDIA)
-docker-compose --profile gpu-nvidia up -d
-
-# For GPU support (AMD)
-docker-compose --profile gpu-amd up -d
+docker-compose up -d
 ```
 
 ### What's Included
 - **MySQL**: Database for n8n and your member data
 - **Adminer**: Web-based database management interface
-- **n8n**: Workflow automation with AI capabilities
-- **Ollama**: Local AI model hosting
-- **Qdrant**: Vector database for AI features
+- **n8n**: Workflow automation for member management
 - **React Frontend**: Member management interface
 
 ### Access Points
 - **Frontend**: http://localhost:3000 (Member Management System)
 - **n8n**: http://localhost:5678 (Workflow Editor)
 - **Adminer**: http://localhost:8080 (Database Management)
-- **Qdrant**: http://localhost:6333 (Vector Database)
-- **Ollama**: http://localhost:11434 (AI Models)
 - **Image Server**: http://localhost:5678/webhook-test/uploads (Image serving endpoint)
 
 ### n8n Workflows
